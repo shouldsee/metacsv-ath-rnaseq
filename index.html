@@ -1,0 +1,51 @@
+<h1 id="metacsv-ath-rnaseq">metacsv-ath-rnaseq</h1>
+<p>An open-source community-managed meta-data sheet for Arabidopsis thaliana</p>
+<h3 id="overview">Overview</h3>
+<p>This project aims to provide a better API for retriving meta-data for a public Ath-RNASEQ dataset. Notably this API can be improved by creating Github PR.</p>
+<h3 id="api-endpoints">API endpoints</h3>
+<ol>
+<li>GET <a href="http://shouldsee.github.io/metacsv-ath-rnaseq/current.csv">http://shouldsee.github.io/metacsv-ath-rnaseq/current.csv</a></li>
+</ol>
+<p>A csv sheet with fields</p>
+<table>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Comment</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>SAMPLE_ID</td>
+<td>str</td>
+<td>main index of the object</td>
+<td>SRS942274</td>
+</tr>
+<tr class="even">
+<td>RUN_ID_LIST_CONCAT</td>
+<td>str</td>
+<td>whitespace-separated values of run id</td>
+<td>SRR2073144 SRR2073145</td>
+</tr>
+<tr class="odd">
+<td>tag_source_name</td>
+<td>str</td>
+<td>describe sample source name. Overrides tags</td>
+<td>shoot apical meristem</td>
+</tr>
+<tr class="even">
+<td>tag_tissue</td>
+<td>str</td>
+<td>describe sample tissue. Overrides tags</td>
+<td>NA</td>
+</tr>
+<tr class="odd">
+<td>tags</td>
+<td>str</td>
+<td>whitespace-separated brackted values.</td>
+<td>[age:11 day after germination] [ecotype:Col-0 (CS70000)] [geo_loc_name:Russia: Moscow] [tissue:shoot apical meristem] [BioSampleModel:Plant]</td>
+</tr>
+</tbody>
+</table>
