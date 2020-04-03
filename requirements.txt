@@ -1,0 +1,13 @@
+numpy
+fastapi
+uvicorn
+pandas
+matplotlib
+path.py
+aiofiles
+spiper
+#sklearn
+eutils>=0.5,<0.6
+xmltodict
+lxml
+pydantic

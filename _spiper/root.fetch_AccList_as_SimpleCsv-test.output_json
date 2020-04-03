@@ -1,0 +1,29 @@
+{
+  "version": "0.1.4",
+  "comment": [
+    [
+      "File('/home/user/repos/metacsv-ath-rnaseq/root.fetch_AccList_as_SimpleCsv-test.csv')",
+      "CacheFile('/home/user/repos/metacsv-ath-rnaseq/_spiper/root.fetch_AccList_as_SimpleCsv-test.cache_pk')"
+    ],
+    [
+      [
+        "/home/user/repos/metacsv-ath-rnaseq/root.fetch_AccList_as_SimpleCsv-test.csv",
+        1585897692.216934,
+        49673
+      ],
+      [
+        "/home/user/repos/metacsv-ath-rnaseq/_spiper/root.fetch_AccList_as_SimpleCsv-test.cache_pk",
+        1585897692.2449346,
+        3001
+      ]
+    ]
+  ],
+  "modules": [
+    [
+      "spiper",
+      "0.1.4"
+    ]
+  ],
+  "output_dump": "gANdcQAoY3NwaXBlci5fdHlwZXMKRmlsZQpxAVhMAAAAL2hvbWUvdXNlci9yZXBvcy9tZXRhY3N2LWF0aC1ybmFzZXEvcm9vdC5mZXRjaF9BY2NMaXN0X2FzX1NpbXBsZUNzdi10ZXN0LmNzdnEChXEDgXEEY3NwaXBlci5fdHlwZXMKQ2FjaGVGaWxlCnEFWFkAAAAvaG9tZS91c2VyL3JlcG9zL21ldGFjc3YtYXRoLXJuYXNlcS9fc3BpcGVyL3Jvb3QuZmV0Y2hfQWNjTGlzdF9hc19TaW1wbGVDc3YtdGVzdC5jYWNoZV9wa3EGhXEHgXEIZS4=",
+  "ident": "gANdcQAoY3NwaXBlci5fdHlwZXMKRmlsZQpxAVhMAAAAL2hvbWUvdXNlci9yZXBvcy9tZXRhY3N2LWF0aC1ybmFzZXEvcm9vdC5mZXRjaF9BY2NMaXN0X2FzX1NpbXBsZUNzdi10ZXN0LmNzdnEChXEDgXEER0HXobg3DeI/TQnCh3EFY3NwaXBlci5fdHlwZXMKQ2FjaGVGaWxlCnEGWFkAAAAvaG9tZS91c2VyL3JlcG9zL21ldGFjc3YtYXRoLXJuYXNlcS9fc3BpcGVyL3Jvb3QuZmV0Y2hfQWNjTGlzdF9hc19TaW1wbGVDc3YtdGVzdC5jYWNoZV9wa3EHhXEIgXEJR0HXobg3D60CTbkLh3EKZS4="
+}

@@ -1,0 +1,29 @@
+{
+  "version": "0.1.4",
+  "comment": [
+    [
+      "CacheFile('/home/user/repos/metacsv-ath-rnaseq/_spiper/current.csv.cache_pk')",
+      "File('/home/user/repos/metacsv-ath-rnaseq/current.csv')"
+    ],
+    [
+      [
+        "/home/user/repos/metacsv-ath-rnaseq/_spiper/current.csv.cache_pk",
+        1585902381.6026518,
+        1216
+      ],
+      [
+        "/home/user/repos/metacsv-ath-rnaseq/current.csv",
+        1585902178.646856,
+        448935
+      ]
+    ]
+  ],
+  "modules": [
+    [
+      "spiper",
+      "0.1.4"
+    ]
+  ],
+  "output_dump": "gANdcQAoY3NwaXBlci5fdHlwZXMKQ2FjaGVGaWxlCnEBWEAAAAAvaG9tZS91c2VyL3JlcG9zL21ldGFjc3YtYXRoLXJuYXNlcS9fc3BpcGVyL2N1cnJlbnQuY3N2LmNhY2hlX3BrcQKFcQOBcQRjc3BpcGVyLl90eXBlcwpGaWxlCnEFWC8AAAAvaG9tZS91c2VyL3JlcG9zL21ldGFjc3YtYXRoLXJuYXNlcS9jdXJyZW50LmNzdnEGhXEHgXEIZS4=",
+  "ident": "gANdcQAoY3NwaXBlci5fdHlwZXMKQ2FjaGVGaWxlCnEBWEAAAAAvaG9tZS91c2VyL3JlcG9zL21ldGFjc3YtYXRoLXJuYXNlcS9fc3BpcGVyL2N1cnJlbnQuY3N2LmNhY2hlX3BrcQKFcQOBcQRHQdehvMtmkdlNwASHcQVjc3BpcGVyLl90eXBlcwpGaWxlCnEGWC8AAAAvaG9tZS91c2VyL3JlcG9zL21ldGFjc3YtYXRoLXJuYXNlcS9jdXJyZW50LmNzdnEHhXEIgXEJR0HXobyYqWYXSqfZBgCHcQplLg=="
+}
