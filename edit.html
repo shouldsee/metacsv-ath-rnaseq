@@ -2,154 +2,76 @@
 <head>
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.css">
 <link rel="stylesheet" type="text/css" href="https://handsontable.com/static/css/main.css">
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.js"></script>
+
+<!-- <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+-->
+
 </head>
 
+
 <body>
-<div id="hot"></div>
 <div id="export-buttons" class="visible"><button id="export-csv" class="btn size-medium bg-blue text-white shadow hover-moveup" style="margin-right: 5px;">Export to a .csv file</button><button id="export-string" class="btn size-medium bg-green text-white shadow hover-moveup">Export to string (see the browser console)</button></div>
+
+<div id="hot"></div>
 
 <script>
 
-
-var dataObject = [
-  {
-    id: 1,
-    flag: 'EUR',
-    currencyCode: 'EUR',
-    currency: 'Euro',
-    level: 0.9033,
-    units: 'EUR / USD',
-    asOf: '08/19/2019',
-    onedChng: 0.0026
-  },
-  {
-    id: 2,
-    flag: 'JPY',
-    currencyCode: 'JPY',
-    currency: 'Japanese Yen',
-    level: 124.3870,
-    units: 'JPY / USD',
-    asOf: '08/19/2019',
-    onedChng: 0.0001
-  }
-];
-var currencyCodes = ['EUR', 'JPY', 'GBP', 'CHF', 'CAD', 'AUD', 'NZD', 'SEK', 'NOK', 'BRL', 'CNY', 'RUB', 'INR', 'TRY', 'THB', 'IDR', 'MYR', 'MXN', 'ARS', 'DKK', 'ILS', 'PHP'];
-
-var flagRenderer = function (instance, td, row, col, prop, value, cellProperties) {
-  var currencyCode = value;
-  while (td.firstChild) {
-    td.removeChild(td.firstChild);
-  }
-  if (currencyCodes.indexOf(currencyCode) > -1) {
-    var flagElement = document.createElement('DIV');
-    flagElement.className = 'flag ' + currencyCode.toLowerCase();
-    td.appendChild(flagElement);
-  } else {
-    var textNode = document.createTextNode(value === null ? '' : value);
-
-    td.appendChild(textNode);
-  }
-};
-var hotElement = document.querySelector('#hot');
-var hotElementContainer = hotElement.parentNode;
-var hotSettings = {
-  data: null,
-  // dataObject,
-  columns: [
-    {
-      data: 'id',
-      type: 'numeric',
-      width: 40
-    },
-    {
-      data: 'flag',
-			renderer: flagRenderer
-    },
-    {
-      data: 'currencyCode',
-      type: 'text'
-    },
-    {
-      data: 'currency',
-      type: 'text'
-    },
-    {
-      data: 'level',
-      type: 'numeric',
-      numericFormat: {
-        pattern: '0.0000'
-      }
-    },
-    {
-      data: 'units',
-      type: 'text'
-    },
-    {
-      data: 'asOf',
-      type: 'date',
-      dateFormat: 'MM/DD/YYYY'
-    },
-    {
-      data: 'onedChng',
-      type: 'numeric',
-      numericFormat: {
-        pattern: '0.00%'
-      }
-    }
-  ],
-  stretchH: 'all',
-  width: 805,
-  autoWrapRow: true,
-  height: 487,
-  maxRows: 22,
-  manualRowResize: true,
-  manualColumnResize: true,
-  rowHeaders: true,
-  colHeaders: true,
-  manualRowMove: true,
-  manualColumnMove: true,
-  contextMenu: true,
-  filters: true,
-  dropdownMenu: true,
-  exportFile: true
-};
-var hot = new Handsontable(hotElement, hotSettings);
-document.addEventListener('DOMContentLoaded', function() {
-	// var xhttp = new XMLHttpRequest();
-	// xhttp.open("GET", "current.csv", true);
-	// xhttp.onreadystatechange = function() {
-	//   if (this.readyState == 4 && this.status == 200) {
-	//   	console.log(this.responseText)
-	//     // document.getElementById("demo").innerHTML = this.responseText;
-	//   }else{
-	//   	console.log(this);
-	//   }
-	// };
-	// xhttp.send();
-  $.ajax({url: "current.csv", success: function(result){
-    // $("#div1").html(result);
-    console.log(result);
-		// var data = CSVToArray(res.response);
-    // console.log('[succc]');
-  }});	
-
-	// $.ajax(
-
-	// 	// 'current.csv',
-	// 	'data:///data/jp2/repos/metacsv-ath-rnaseq/current.csv',
-	// 	// edit.html
-	// 	 'GET', '', function(res) {
-	// 	var data = CSVToArray(res.response);
-	//     hot.loadData(data.data);
-	//     // exampleConsole.innerText = 'Data loaded';
- //  });
-});
-hot.loadData(dataObject);
-
 document.getElementById("export-csv").addEventListener("click", function(event) { hot.getPlugin("exportFile").downloadFile("csv", {filename: "Handsontable CSV Export example"});})
 document.getElementById("export-string").addEventListener("click", function(event) {console.log(hot.getPlugin("exportFile").exportAsString("csv"));})
+
+
+// var hotElement = document.querySelector('#hot');
+// var hotElementContainer = hotElement.parentNode;
+// var hotSettings = {};
+// var hot = new Handsontable(hotElement, hotSettings);
+
+document.addEventListener('DOMContentLoaded', function() {
+
+	var xhttp = new XMLHttpRequest();
+	xhttp.open("GET", "current.csv", true);
+
+	xhttp.onreadystatechange = function() {
+	  if (this.readyState == 4 && this.status == 200) {
+		var dataBuffer = CSVToArray(this.responseText);
+
+		window.dataBuffer = dataBuffer;
+		var columns = dataBuffer[0];
+		var hotSettings = {
+		  data: dataBuffer.slice(1),
+		  // dataObject,
+		  colHeaders: columns,
+		  columns: [...Array(columns.length).keys()].map(function(v){return ({data:v, width:(window.innerWidth-100)/columns.length})}),
+		  stretchH: 'all',
+		  width: 805,
+		  autoWrapRow: true,
+		  // height: "100%",
+		  // maxRows: 22,
+		  manualRowResize: true,
+		  manualColumnResize: true,
+		  rowHeaders: true,
+		  // colHeaders: true,
+		  manualRowMove: true,
+		  manualColumnMove: true,
+		  contextMenu: true,
+		  filters: true,
+		  dropdownMenu: true,
+		  exportFile: true
+		};    
+		// container2 = document.getElementById('hot')
+		window.hot2 = new Handsontable(
+			document.getElementById('hot'),
+			hotSettings);
+	  	// console.log(this.responseText)
+	    // document.getElementById("demo").innerHTML = this.responseText;
+	  }else{
+	  	console.log(this);
+	  }
+	};
+	xhttp.send();
+
+});
+
 
     // ref: http://stackoverflow.com/a/1293163/2343
     // This will parse a delimited string into an array of
