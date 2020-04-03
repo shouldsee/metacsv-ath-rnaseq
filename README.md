@@ -20,7 +20,7 @@ A csv sheet with fields
 | ---       | ---    | ---------------------------- | ------  | 
 | SAMPLE_ID | str    | main index of the object | SRS942274 |
 | RUN_ID_LIST_CONCAT | str | whitespace-separated values of run id | SRR2073144 SRR2073145 | 
-| tag_source_name | str  | describe sample source name. Overrides tags| shoot apical meristem
+| tag_source_name | str  | describe sample source name. Overrides tags| shoot apical meristem | 
 | tag_tissue    |  str   |  describe sample tissue. Overrides tags|  NA |
 | tags      |  str   | whitespace-separated brackted values.  | [age:11 day after germination] [ecotype:Col-0 (CS70000)] [geo_loc_name:Russia: Moscow] [tissue:shoot apical meristem] [BioSampleModel:Plant] |
 

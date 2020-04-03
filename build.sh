@@ -12,7 +12,7 @@ curl -LC- -o pandoc.css.temp https://gist.github.com/killercup/5917178/raw/40840
 	echo '</style>'
 } > pandoc.css
 
-pandoc --standalone --include-in-header pandoc.css --from gfm --to html README.md >$DIR/index.html
+pandoc --standalone --include-in-header pandoc.css --from gfm --to html $DIR/README.md >$DIR/index.html
 head $DIR/index.html
 
 cd $DIR

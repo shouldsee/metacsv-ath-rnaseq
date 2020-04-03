@@ -110,7 +110,7 @@ if __name__ == '__main__':
 		'$PWD/_build/root', 
 		'$PWD/metacsv_ath_rnaseq/root.dump_columns.csv',
 		'NULL',
-		'$PWD/metacsv_ath_rnaseq/root.hand_patch.csv',)
+		'$PWD/root.hand_patch.csv',)
 	runner = get_changed_files
 	pprint(runner(*tups))
 	runner = cache_run
