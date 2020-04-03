@@ -96,9 +96,9 @@ def main(self, prefix, csv_file = File,
 				fo.write('\n'.join(f.read().splitlines()[:100]))
 	self.config_runner(tag='test')(fetch_AccList_as_SimpleCsv,       prefix, test_csv_file) 
 	
-	curr = self.config_runner(tag='production')(fetch_AccList_as_SimpleCsv, prefix,  csv_file) 
-	if not script.endswith('NULL'):
-		curr = self.config_runner(tag='production')(patch_by_script,               prefix,  csv_file,         script)
+	curr = self.config_runner(tag='production')(fetch_AccList_as_SimpleCsv,    prefix,  csv_file) 
+	curr =(self.config_runner(tag='production')(patch_by_script,               prefix,  csv_file,         script) 
+		if not script.endswith('NULL') else curr)
 	curr = self.config_runner(tag='production')(patch_by_hand,                 prefix,  curr.output.csv,  hand_patch_csv)
 	return self
 
