@@ -1,12 +1,12 @@
-
+<!DOCTYPE html>
 <head>
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.css">
 <link rel="stylesheet" type="text/css" href="https://handsontable.com/static/css/main.css">
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.js"></script>
 </head>
 
-
+<body>
 <div id="hot"></div>
 <div id="export-buttons" class="visible"><button id="export-csv" class="btn size-medium bg-blue text-white shadow hover-moveup" style="margin-right: 5px;">Export to a .csv file</button><button id="export-string" class="btn size-medium bg-green text-white shadow hover-moveup">Export to string (see the browser console)</button></div>
 
@@ -323,3 +323,6 @@ document.getElementById("export-string").addEventListener("click", function(even
         return( arrData );
     }
 </script>
+
+</body>
+</html>
