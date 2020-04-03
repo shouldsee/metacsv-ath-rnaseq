@@ -17,7 +17,7 @@ Notably this API can be improved by creating Github PR.
 A csv sheet with fields
 
 | Name      | Type   | Comment | Example |
-| ---       | ---    | ------- | ------  | 
+| ---       | ---    | ---------------------------- | ------  | 
 | SAMPLE_ID | str    | main index of the object | SRS942274 |
 | RUN_ID_LIST_CONCAT | str | whitespace-separated values of run id | SRR2073144 SRR2073145 | 
 | tag_source_name | str  | describe sample source name. Overrides tags| shoot apical meristem
