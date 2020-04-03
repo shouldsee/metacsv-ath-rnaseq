@@ -11,3 +11,4 @@ eutils>=0.5,<0.6
 xmltodict
 lxml
 pydantic
+pytest

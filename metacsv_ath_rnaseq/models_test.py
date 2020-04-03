@@ -1,12 +1,12 @@
 
-from meta import fetch_ncbi_sra_samples
+# from meta import fetch_ncbi_sra_samples
 from models import LocalSample
 import xmltodict
-
 from models import tree_from_dict
+from _fetch import fetch_ncbi_sra_samples
 
 
-if __name__ == '__main__':
+def test_main():
 	index = 'ERS214143,ERS214131,DRS007602,DRS007600,DRS007601'.split(',')
 	buf = fetch_ncbi_sra_samples(index,  'fg368@cam.ac.uk')
 	# jdata = xmltodict.parse(buf)
@@ -23,3 +23,5 @@ if __name__ == '__main__':
 	x['a']['b']
 
 	print('[passed]%s'%__file__)
+if __name__ == '__main__':
+	test_main()

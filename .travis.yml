@@ -19,10 +19,12 @@ before_install:
 install:
   - echo pass
 script:
+  - set -e
   - pip install .
   - python -V
   - pip install .
-  - python test.py --all
+  - python -m pytest
+  - python main.py --run
   # - ls -lhtr /deps/*
   # - tree /deps
 
