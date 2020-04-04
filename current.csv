@@ -219,7 +219,7 @@ SRS941690,SRR2033951,rosettes - 5 leaves stage,rosette leaves,[source_name:roset
 SRS941691,SRR2033950,rosettes - 5 leaves stage,rosette leaves,[source_name:rosette leaves] [tissue:rosettes - 5 leaves stage] [exposure time:heat stress 6 h 37°C] [ecotype:Col-0]
 SRS941692,SRR2033949,rosettes - 5 leaves stage,rosette leaves,[source_name:rosette leaves] [tissue:rosettes - 5 leaves stage] [exposure time:heat stress 0 h] [ecotype:Col-0]
 SRS941693,SRR2033948,rosettes - 5 leaves stage,rosette leaves,[source_name:rosette leaves] [tissue:rosettes - 5 leaves stage] [exposure time:heat stress 0 h] [ecotype:Col-0]
-SRS932043,SRR2014766,,seedling,[source_name:seedling] [ecotype:Col-0] [genotype:35S::FLAG-GR-KAN1]
+SRS932043,SRR2014766,seedling,seedling,[source_name:seedling] [ecotype:Col-0] [genotype:35S::FLAG-GR-KAN1]
 SRS932044,SRR2014765,,seedling,[source_name:seedling] [ecotype:Col-0] [genotype:35S::FLAG-GR-KAN1]
 SRS932045,SRR2014764,,seedling,[source_name:seedling] [ecotype:Col-0] [genotype:wildtype]
 SRS932046,SRR2014763,,seedling,[source_name:seedling] [ecotype:Col-0] [genotype:wildtype]
