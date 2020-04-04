@@ -23,7 +23,7 @@ DIR=$PWD
 git config user.email metacsv-bot@protonmail.com
 git config user.name metacsv-bot
 git checkout -b "$branch"
-git commit ./root.hand_patch.csv -m "$branch"
+git commit ./root.hand_patch.csv ./current.csv -m "$branch"
 $DIR/bin/hub pull-request --base shouldsee:master -p $@
 git checkout master
 rm -f .cred

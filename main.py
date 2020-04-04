@@ -106,6 +106,16 @@ if __name__ == '__main__':
 	from spiper.runner import get_changed_files,cache_run
 	from pprint import pprint
 	import sys
+
+	if 'patch_by_hand' in sys.argv:
+		from spiper.runner import force_run
+		from path import Path
+		# from main import patch_by_hand
+		curr = force_run(patch_by_hand, '_temp', 'current.csv', 'root.hand_patch.csv')
+		curr.output.csv.link(Path('current.csv').unlink_p())
+		sys.exit(0)
+
+
 	tups = (main,  
 		'$PWD/_build/root', 
 		'$PWD/metacsv_ath_rnaseq/root.dump_columns.csv',
