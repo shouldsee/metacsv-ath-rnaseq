@@ -12,3 +12,4 @@ lxml
 pydantic
 pytest
 spiper@https://github.com/shouldsee/spiper/tarball/0.1.4
+tzlocal
