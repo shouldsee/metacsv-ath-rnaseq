@@ -1,6 +1,6 @@
 SAMPLE_ID,RUN_ID_LIST_CONCAT,tag_tissue,tag_source_name,tags
 SRS973484,SRR2080056,aerial tissues of 15 day seedlings,Whole aerial tissue 15 day old seedlings,[source_name:Whole aerial tissue 15 day old seedlings] [tissue:aerial tissues of 15 day seedlings] [genotype:Ler]
-SRS973487,"test,test",aerial tissues of 15 day seedlings,Whole aerial tissue 15 day old seedlings,[source_name:Whole aerial tissue 15 day old seedlings] [tissue:aerial tissues of 15 day seedlings] [genotype:Ler]
+SRS973487,"foo,bar",aerial tissues of 15 day seedlings,Whole aerial tissue 15 day old seedlings,[source_name:Whole aerial tissue 15 day old seedlings] [tissue:aerial tissues of 15 day seedlings] [genotype:Ler]
 SRS973488,SRR2080054,aerial tissues of 15 day seedlings,Whole aerial tissue 15 day old seedlings,[source_name:Whole aerial tissue 15 day old seedlings] [tissue:aerial tissues of 15 day seedlings] [genotype:C24]
 SRS973489,SRR2080053,aerial tissues of 15 day seedlings,Whole aerial tissue 15 day old seedlings,[source_name:Whole aerial tissue 15 day old seedlings] [tissue:aerial tissues of 15 day seedlings] [genotype:C24]
 SRS973490,SRR2080052,aerial tissues of 15 day seedlings,Whole aerial tissue 15 day old seedlings,[source_name:Whole aerial tissue 15 day old seedlings] [tissue:aerial tissues of 15 day seedlings] [genotype:S2-1]
