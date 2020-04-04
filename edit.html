@@ -54,6 +54,14 @@
 
 <script>
 
+var xhr = new XMLHttpRequest();
+xhr.open("GET","https://api.github.com/repos/shouldsee/metacsv-ath-rnaseq/git/refs",false);
+xhr.onreadystatechange = function(){
+	document.github_refs = JSON.parse( this.responseText);
+	document.github_sha = document.github_refs.find(ele => ele.ref === "refs/heads/master").object.sha
+}
+xhr.send();
+
 document.getElementById("export-csv").addEventListener("click", function(event) { document.hot.getPlugin("exportFile").downloadFile("csv", {filename: "Handsontable CSV Export example"});})
 document.getElementById("export-string-modal").addEventListener("click", function(event) {
 	// console.log("hi");
@@ -86,7 +94,8 @@ document.getElementById("export-string-modal").addEventListener("click", functio
 		"data":data,
 		"columns":document.hot.getColHeader(),
 		"email":meta.email,
-		"pr_tag":meta.pr_tag
+		"pr_tag":meta.pr_tag,
+		"github_sha":document.github_sha
 	}));
 
 	// xhr.send(JSON.stringify(document.hot.getData()));
@@ -101,7 +110,8 @@ document.getElementById("export-string-modal").addEventListener("click", functio
 document.addEventListener('DOMContentLoaded', function() {
 
 	var xhttp = new XMLHttpRequest();
-	xhttp.open("GET", "current.csv", true);
+	var url = `https://raw.githubusercontent.com/shouldsee/metacsv-ath-rnaseq/${document.github_sha}/current.csv`;
+	xhttp.open("GET", url, true);
 	xhttp.onreadystatechange = function() {
 	  if (this.readyState == 4 && this.status == 200) {
 		var dataBuffer = CSVToArray(this.responseText);

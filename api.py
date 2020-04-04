@@ -26,6 +26,7 @@ class csvData(BaseModel):
 	email: str
 	pr_tag: str
 	gh_token: str = None
+	github_sha: str
 
 
 
@@ -35,9 +36,15 @@ def auto_pull_request( dat:csvData):
 	import os
 	from pprint import pprint
 	from collections import OrderedDict
+	import requests,io
 	GH_TOKEN = os.environ.get('GH_TOKEN')
+	# sha1 = subprocess.check_output('git rev-parse --verify HEAD',shell=True).strip()
+	# if sha1
 	# print(newDf).head()
 	edit_csv = 'root.hand_patch.csv'
+	subprocess.check_output('git pull origin master',shell=True)
+	subprocess.check_output(f'git checkout -f {dat.github_sha}',shell=True)
+	# oldCsv = io.BytesIO(requests.get(f'https://raw.githubusercontent.com/shouldsee/metacsv-ath-rnaseq/{dat.github_sha}/current.csv').content)
 	oldCsv = 'current.csv'
 	oldDf = pd.read_csv( oldCsv,index_col=[0],header=0)
 	newDf = pd.DataFrame( dat.data, None, dat.columns).set_index('SAMPLE_ID')
@@ -90,25 +97,35 @@ def auto_pull_request( dat:csvData):
 		print('[no_record_changed]')
 		##### No records changed. return respose 
 		return Response('[nothing_changed]')
-	editDf.fillna("NA").to_csv(edit_csv, index=1)
-	isotime  = date_format_iso()
-	pr_title ='{dat.pr_tag}_{dat.email}_{isotime}'
-	pr_title = pr_title.format(**locals())
-	prm_file = '_pr.message'
+	else:
+		editDf.fillna("NA").to_csv(edit_csv, index=1)
 
-	meta = pd.DataFrame([],None,columns=['value'])
-	# .set_index()
-	with open(prm_file,'w') as f:
-		f.write('%s\n\n'%pr_title)
-		f.write('### Changed Rows \n')
-		pd.Series(labels).to_frame('STATUS').merge(left_index=True,right_index=True,how='left',right=newDf_indexed).to_html(f)
-		# pd.Series(labels).to_frame('STATUS').to_html(f)
-		f.write('\n\n')
-		f.write('### Pull Request Meta \n')
-		# f.write('--------------------------\n')
-		meta.loc['isotime'] = isotime
-		meta.to_html(f)
-		f.write('\n\n')
+		from spiper.runner import force_run
+		from path import Path
+		from main import patch_by_hand
+		curr = force_run(patch_by_hand, '_temp', 'current.csv', edit_csv)
+		curr.output.link(Path('current.csv').unlink_p())
+
+		isotime  = date_format_iso()
+		pr_title ='{dat.pr_tag}_{dat.email}_{isotime}'
+		pr_title = pr_title.format(**locals())
+		prm_file = '_pr.message'
+
+		meta = pd.DataFrame([],None,columns=['value'])
+		# .set_index()
+		with open(prm_file,'w') as f:
+			f.write('%s\n\n'%pr_title)
+			f.write('### Changed Rows \n')
+			pd.Series(labels).to_frame('STATUS').to_html(f)
+			f.write('\n\n')
+			f.write('### Pull Request Meta \n')
+			# f.write('--------------------------\n')
+			meta.loc['isotime'] = isotime
+			meta.to_html(f)
+			f.write('\n\n')
+			f.write('### New rows details \n')
+			pd.Series(labels).to_frame('STATUS').merge(left_index=True,right_index=True,how='left',right=newDf_indexed).to_html(f)
+			f.write('\n\n')
 
 	subprocess.check_output(' '.join(['HUB_VERBOSE=1','bash','autopr.sh',GH_TOKEN,
 		'--file',prm_file,
