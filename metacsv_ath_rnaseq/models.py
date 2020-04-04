@@ -50,6 +50,10 @@ class LocalSample(BaseModel):
 	def tag_tissue(self) -> str:
 		return self.SAMPLE_ATTRIBUTES.get('tissue','NA')
 	@property
+	def tag_age(self) -> str:
+		return self.SAMPLE_ATTRIBUTES.get('age','NA')
+
+	@property
 	def tags(self) -> str:
 		return ' '.join(['[{0}:{1}]'.format(k,v) for k,v in self.SAMPLE_ATTRIBUTES.items()])
 	@property
@@ -80,11 +84,12 @@ class LocalSample(BaseModel):
 
 	def to_simple_dict(self):
 		return OrderedDict([
-			('SAMPLE_ID',self.SAMPLE_ID),
-			('RUN_ID_LIST_CONCAT', self.RUN_ID_LIST_CONCAT),
-			('tag_tissue',self.tag_tissue),
-			('tag_source_name',self.tag_source_name),
-			('tags', self.tags),
+			('SAMPLE_ID',           self.SAMPLE_ID),
+			('RUN_ID_LIST_CONCAT',  self.RUN_ID_LIST_CONCAT),
+			('tag_tissue',          self.tag_tissue),
+			('tag_source_name',     self.tag_source_name),
+			('tag_age',             self.tag_age),
+			('tags',                self.tags),
 		])
 
 	@classmethod
@@ -94,9 +99,11 @@ class LocalSample(BaseModel):
 		out_data['RUN_ID_LIST'] = data['RUN_ID_LIST_CONCAT'].split()
 
 		if data['tag_tissue'] !='NA':
-			out_data['SAMPLE_ATTRIBUTES']['tag_tissue'] = data['tissue']
+			out_data['SAMPLE_ATTRIBUTES']['tissue'] = data['tag_tissue']
 		if data['tag_source_name'] != 'NA':
-			out_data['SAMPLE_ATTRIBUTES']['tag_source_name'] = data['source_name']
+			out_data['SAMPLE_ATTRIBUTES']['source_name'] = data['tag_source_name']
+		if data['tag_age'] != 'NA':
+			out_data['SAMPLE_ATTRIBUTES']['age'] = data['tag_age']
 		return cls.parse_obj(out_data)
 
 	@classmethod
