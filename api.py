@@ -93,18 +93,15 @@ def auto_pull_request( dat:csvData):
 				del editDf.loc[SAMPLE_ID]
 		else:
 			assert 0,(label,)	
+
 	if not len(labels):
 		print('[no_record_changed]')
 		##### No records changed. return respose 
 		return Response('[nothing_changed]')
 	else:
+		import sys
 		editDf.fillna("NA").to_csv(edit_csv, index=1)
-
-		from spiper.runner import force_run
-		from path import Path
-		from main import patch_by_hand
-		curr = force_run(patch_by_hand, '_temp', 'current.csv', edit_csv)
-		curr.output.link(Path('current.csv').unlink_p())
+		subprocess.check_output(f'{sys.executable} main.py patch_by_hand 2>ERROR',shell=True)
 
 		isotime  = date_format_iso()
 		pr_title ='{dat.pr_tag}_{dat.email}_{isotime}'
