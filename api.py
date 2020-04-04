@@ -101,7 +101,8 @@ def auto_pull_request( dat:csvData):
 	with open(prm_file,'w') as f:
 		f.write('%s\n\n'%pr_title)
 		f.write('### Changed Rows \n')
-		pd.Series(labels).to_frame('STATUS').to_html(f)
+		pd.Series(labels).to_frame('STATUS').merge(left_index=True,right_index=True,how='left',right=newDf_indexed).to_html(f)
+		# pd.Series(labels).to_frame('STATUS').to_html(f)
 		f.write('\n\n')
 		f.write('### Pull Request Meta \n')
 		# f.write('--------------------------\n')
