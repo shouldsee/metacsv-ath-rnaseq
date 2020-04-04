@@ -175,9 +175,9 @@ ERS374056,ERR377676,leaf,,[Alias:1] [ENA checklist:ERC000011] [INSDC center alia
 SRS599267,SRR1574689,seedling,,[cultivar:lba1] [biomaterial_provider:Sergei Filichkin] [tissue:seedling] [sample_type:untreated replicate 3] [treatment:none] [geo_loc_name:missing] [age:missing] [BioSampleModel:Plant]
 SRS992611,SRR2102895,root,,[age:9 days old] [dev_stage:seedling] [ecotype:Col-0] [geo_loc_name:USA] [tissue:root] [BioSampleModel:Plant]
 SRS986293,SRR2094583 SRR2094587,Leaf,,[age:35 days] [ecotype:Columbia] [geo_loc_name:Mexico: Mexico city] [tissue:Leaf] [genotype:Over expressor of FLOWERING LOCUS T] [BioSampleModel:Plant]
-SRS980561,SRR2088876,,,
-SRS980560,SRR2088875,,,
-SRS980559,SRR2088874,,,
+SRS980561,SRR2088876,test1,,
+SRS980560,SRR2088875,test1,,
+SRS980559,SRR2088874,test1,,
 SRS980558,SRR2088873,,,
 SRS980562,SRR2088872,,,
 SRS980563,SRR2088871,,,
