@@ -1,0 +1,6 @@
+# 0.0.2
+- Changed Database layout from a csv file to a embedded directory tree
+- need to optimise for speed
+
+# 0.0.1
+- init version

@@ -3,6 +3,15 @@
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.css">
 <link rel="stylesheet" type="text/css" href="https://handsontable.com/static/css/main.css">
 <script src="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.js"></script>
+<!--
+    <script type="text/javascript" src="https://raw.githubusercontent.com/nodeca/pako/master/dist/pako.js"></script>
+https://raw.githubusercontent.com/InvokIT/js-untar/master/build/dist/untar.js
+-->
+<script type="text/javascript" src="/static/js/pako.js"></script>
+<script type="text/javascript" src="/static/js/untar.js"></script>
+
+
+
 
 <!-- <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 -->
@@ -42,7 +51,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" id="export-string-modal" class="btn btn-primary">Creat PR</button>
+        <button type="button" id="export-string-modal" class="btn btn-primary">Create PR</button>
       </div>
     </div>
   </div>
@@ -50,15 +59,76 @@
 
 
 
-<div id="hot"></div>
+<div id="hot">Table loading, might take 20 seconds.... </div>
 
 <script>
+{
+    var test = { my: 'super', puper: [456, 567], awesome: 'pako' };
+    var binaryString = pako.deflate(JSON.stringify(test), { to: 'string' });
+    var restored = JSON.parse(pako.inflate(binaryString, { to: 'string' }));
+
+};
+
+
+function load_tar_gz(url){
+    url = 'https://github.com/shouldsee/metacsv-ath-rnaseq/tarball/master';
+    var xhr = new XMLHttpRequest();
+    var req = xhr;
+    xhr.open("GET",`https://cors-anywhere.herokuapp.com/${url}`,true);
+    // https://codeload.github.com/mafintosh/tar-stream/legacy.tar.gz/master",true);
+    xhr.responseType = "arraybuffer";
+    function stringToArrayBuffer(str) {
+        // workaround suggested by https://stackoverflow.com/a/27131778/8083313
+        var buf = new ArrayBuffer(str.length);
+        var bufView = new Uint8Array(buf);
+        for (var i=0, strLen=str.length; i<strLen; i++) {
+            bufView[i] = str.charCodeAt(i);
+        }
+        return buf;
+    }
+    function dirname(path) {
+         return path.match(/.*\//)[0];
+         // .toString();
+    }    
+    // xhr.onreadystatechange = function(){
+    xhr.onload = function(){
+        var curr;
+        window.curr = curr = this.response;
+        window.curr = curr = pako.ungzip( curr, 
+            { to: 'string' }
+            );
+        var curr = stringToArrayBuffer(curr);
+        untar( curr )
+            .then(function(extractedFiles) {
+                console.log(extractedFiles[0].name);
+                console.log("extacting2");                
+                window.extractedFiles = extractedFiles;
+                extractedFiles.map(function(fn){
+                    window.fn = fn;
+                    dir = dirname(fn.name);
+                    if (fn.name.startsWith("shouldsee-metacsv-ath-rnaseq-dc5c288/DATABASE"))
+                    {
+                        console.log(fn.name);
+
+                    };
+                    // if (dir==="shouldsee-metacsv-ath-rnaseq-dc5c288/DATABASE" & dir!=fn.name){
+                    //     console.log(fn.name);
+                    // };
+                })
+            });
+
+    }
+    xhr.send();
+
+}
+
 
 var xhr = new XMLHttpRequest();
 xhr.open("GET","https://api.github.com/repos/shouldsee/metacsv-ath-rnaseq/git/refs",false);
 xhr.onreadystatechange = function(){
 	document.github_refs = JSON.parse( this.responseText);
-	document.github_sha = document.github_refs.find(ele => ele.ref === "refs/heads/master").object.sha
+	document.github_sha = document.github_refs.find(ele => ele.ref === "refs/heads/data").object.sha
+    // document.github_sha = "362b3269498253d7f64ec04b96ce37cbeba410d5"
 }
 xhr.send();
 
@@ -110,12 +180,16 @@ document.getElementById("export-string-modal").addEventListener("click", functio
 document.addEventListener('DOMContentLoaded', function() {
 
 	var xhttp = new XMLHttpRequest();
-	var url = `https://raw.githubusercontent.com/shouldsee/metacsv-ath-rnaseq/${document.github_sha}/current.csv`;
+    var url = `/csv/${document.github_sha}`;
+    // window.alert('blah');
+	// var url = `https://raw.githubusercontent.com/shouldsee/metacsv-ath-rnaseq/${document.github_sha}/current.csv`;
 	xhttp.open("GET", url, true);
+    xhttp.timeout = 40000;
 	xhttp.onreadystatechange = function() {
 	  if (this.readyState == 4 && this.status == 200) {
+        console.log("...loading csv");
+        console.log(this.responseText.slice(100));
 		var dataBuffer = CSVToArray(this.responseText);
-
 		document.dataBuffer = dataBuffer;
 		var columns = dataBuffer[0];
 		var hotSettings = {
