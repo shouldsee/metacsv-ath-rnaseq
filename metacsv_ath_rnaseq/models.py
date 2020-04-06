@@ -3,8 +3,8 @@ import warnings
 from typing import List,Dict
 from collections import OrderedDict
 from pydantic import BaseModel
-from collections import OrderedDict
 from collections import defaultdict
+# from metacsv_ath_rnaseq.header import
 
 def tree(): return defaultdict(tree)
 def tree_from_dict(data):
@@ -97,12 +97,11 @@ class LocalSample(BaseModel):
 		out_data = data.copy()
 		out_data['SAMPLE_ATTRIBUTES'] = cls.parse_tags(data['tags'])
 		out_data['RUN_ID_LIST'] = data['RUN_ID_LIST_CONCAT'].split()
-
-		if data['tag_tissue'] !='NA':
+		if data.get('tag_tissue','NA') not in ['NA','']:
 			out_data['SAMPLE_ATTRIBUTES']['tissue'] = data['tag_tissue']
-		if data['tag_source_name'] != 'NA':
+		if data.get('tag_source_name','NA') not in ['NA','']:
 			out_data['SAMPLE_ATTRIBUTES']['source_name'] = data['tag_source_name']
-		if data['tag_age'] != 'NA':
+		if data.get('tag_sge','NA') not in ['NA','']:
 			out_data['SAMPLE_ATTRIBUTES']['age'] = data['tag_age']
 		return cls.parse_obj(out_data)
 
