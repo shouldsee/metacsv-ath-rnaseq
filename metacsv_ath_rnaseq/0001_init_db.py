@@ -15,13 +15,18 @@ def df_stand(df):
 df  = df_stand(df.set_index('SAMPLE_ID')).fillna('NA')
 lst = df.to_dict(orient='records')
 
+from collections import OrderedDict
 with Path('DATABASE').makedirs_p():
+	out = OrderedDict()
 	for x in lst[:]:
 		y =  LocalSample.from_simple_dict(x)
 		d = y.SAMPLE_ATTRIBUTES
 		if 'genotype/variation' in d:
 			d['genotype_variation'] = d.pop('genotype/variation')
-		x = y.dump_dir(x['SAMPLE_ID'])
+		# x = y.dump_dir(x['SAMPLE_ID'])
+		out[x['SAMPLE_ID']] = y.dict()
+	dict_dump_dir(out,'DATABASE')
+
 print('[done]')
 
 
