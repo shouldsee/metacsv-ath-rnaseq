@@ -18,6 +18,8 @@ def dict_dump_dir(obj, fn):
 		fn = Path(fn).check_writable().makedirs_p()
 		with open(fn/'_dir_type','w') as f:
 			f.write(obj.__class__.__name__)
+		with open(fn/'_dir_order','w') as f:
+			f.write('\n'.join(obj.keys()))
 		if isinstance(obj, dict):
 			for k,v in obj.items():
 				this(v, fn / k)
@@ -152,6 +154,7 @@ class PathLike(object):
 			name = self.data.name+'/'+other
 			return self.tarfile.index[name]
 
+from pprint import pprint
 
 def dict_load_dir(fn):
 	this = dict_load_dir
@@ -167,15 +170,20 @@ def dict_load_dir(fn):
 	elif fn.isdir():
 		typename = (fn/'_dir_type').open('rb').read().decode().strip()
 		cls = safe_eval(typename)
-		fs = [x for x in fn.listdir() if x.basename()!='_dir_type']
+		fs = [x.basename() for x in fn.listdir() if x.basename() not in ['_dir_type','_dir_order']]
 		if cls == list:
 			obj = [None] * len(fs)
 			for x in fs:
 				obj.__setitem__( int( x.basename()),  this(x) )
 		elif issubclass( cls, dict):
 			obj = cls()
+			if issubclass(cls,OrderedDict):
+				od = (fn/'_dir_order').read('rb').read().decode().splitlines()
+				assert set(fs) == set(od),pprint((fs,od))
+				fs = od
+				
 			for x in fs:
-				obj.__setitem__( x.basename(),  this(x) )
+				obj.__setitem__( x.basename(),  this(fn / x) )
 		else:
 			raise RoutineTypeUndefined(cls)
 	return obj

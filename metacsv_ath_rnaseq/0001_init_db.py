@@ -25,6 +25,7 @@ with Path('.').makedirs_p():
 			d['genotype_variation'] = d.pop('genotype/variation')
 		# x = y.dump_dir(x['SAMPLE_ID'])
 		out[x['SAMPLE_ID']] = y.dict()
+#		out[x['SAMPLE_ID']] = {}
 	dict_dump_dir(out,'DATABASE')
 
 print('[done]')
