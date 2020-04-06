@@ -190,9 +190,9 @@ def auto_pull_request( dat:csvData):
 		CMD = [jinja2_format(CMD,**locals())]
 		_shell(CMD)
 
+	tdir.rmtree()
 	print('[auto_pr]Done')
 	return Response('[auto_pr]%s'%pr_title)
-tdir.rmtree()
 
 def _shell(CMD,**kw):
 	return subprocess.check_output(' '.join(CMD),shell=True,executable='bash',**kw)
