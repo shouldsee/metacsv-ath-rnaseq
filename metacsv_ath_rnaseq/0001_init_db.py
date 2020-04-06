@@ -16,7 +16,7 @@ df  = df_stand(df.set_index('SAMPLE_ID')).fillna('NA')
 lst = df.to_dict(orient='records')
 
 from collections import OrderedDict
-with Path('DATABASE').makedirs_p():
+with Path('.').makedirs_p():
 	out = OrderedDict()
 	for x in lst[:]:
 		y =  LocalSample.from_simple_dict(x)
