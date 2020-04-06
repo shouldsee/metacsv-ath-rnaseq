@@ -118,7 +118,7 @@ class LocalSample(BaseModel):
 			out_data['SAMPLE_ATTRIBUTES']['tissue'] = data['tag_tissue']
 		if data.get('tag_source_name','NA') not in ['NA','']:
 			out_data['SAMPLE_ATTRIBUTES']['source_name'] = data['tag_source_name']
-		if data.get('tag_sge','NA') not in ['NA','']:
+		if data.get('tag_age','NA') not in ['NA','']:
 			out_data['SAMPLE_ATTRIBUTES']['age'] = data['tag_age']
 		return cls.parse_obj(out_data)
 
