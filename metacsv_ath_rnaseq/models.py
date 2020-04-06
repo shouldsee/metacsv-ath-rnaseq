@@ -4,7 +4,7 @@ from typing import List,Dict
 from collections import OrderedDict
 from pydantic import BaseModel
 from collections import defaultdict
-# from metacsv_ath_rnaseq.header import
+from metacsv_ath_rnaseq.header import dict_dump_dir, dict_load_dir
 
 def tree(): return defaultdict(tree)
 def tree_from_dict(data):
@@ -65,6 +65,23 @@ class LocalSample(BaseModel):
 		'''
 		Dirty parsing
 		'''
+		dct = OrderedDict()
+		import re
+		lst = re.split('\[([a-zA-Z\-_ ]*):', buf)
+		k = None
+		for i, ele in enumerate(lst[1:]):
+			if (i % 2)   == 0:
+				k = ele
+			elif (i % 2) == 1:
+				ele = ele.strip()
+				assert ele.endswith(']'),ele
+				v = ele[:-1]
+				dct[k] = v
+				k = None
+		assert k is None,(buf)
+		return dct
+
+
 		sp = buf.strip().split('[')
 		dct = {}
 		for ele in sp:
@@ -109,7 +126,6 @@ class LocalSample(BaseModel):
 	def normalise_words(cls,words):
 		lst = []
 		for x in words:
-
 			lst.append(cls.normalise_word(x))
 		return lst
 
@@ -142,6 +158,16 @@ class LocalSample(BaseModel):
 			for x in data['SAMPLE'][0]['SAMPLE_ATTRIBUTES'][0]['SAMPLE_ATTRIBUTE']
 			}
 		return cls.parse_obj(out_data)
+
+	def dump_dir(self, fn):
+		dict_dump_dir(self.dict(), fn)
+
+	@classmethod
+	def from_dir(cls,fn):
+		d = dict_load_dir(fn)
+		d = cls.parse_obj(d)
+		return d
+
 
 
 

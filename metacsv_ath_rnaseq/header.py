@@ -4,6 +4,7 @@ from collections import OrderedDict
 
 class RoutineTypeUndefined(Exception):
 	pass
+
 class Path(_Path):
 	def check_writable(self):
 		self.access(os.W_OK)
@@ -33,13 +34,16 @@ def dict_dump_dir(obj, fn):
 def safe_eval(s):
 	return eval(s)
 
+# def common_open(fn,*a):
+
+
 def dict_load_dir(fn):
 	this = dict_load_dir
 	fn = Path(fn)
 	if not fn.exists():
 		raise Exception("Path %s does not exists" % fn)
 	elif fn.isfile():
-		with open(fn,'r') as f:
+		with fn.open('r') as f:
 			buf = f.read()
 			cls, buf = buf.split(',',1)
 			cls = safe_eval(cls)
@@ -56,5 +60,4 @@ def dict_load_dir(fn):
 			[obj.__setitem__( x.basename(),  this(x) ) for x in fs ]
 		else:
 			raise RoutineTypeUndefined(cls)
-
 	return obj
