@@ -180,23 +180,37 @@ document.getElementById("export-string-modal").addEventListener("click", functio
 document.addEventListener('DOMContentLoaded', function() {
 
 	var xhttp = new XMLHttpRequest();
-    var url = `/csv/${document.github_sha}`;
+    // var url = `/csv/${document.github_sha}`;
+    var url = `/simple_json/${document.github_sha}`;
     // window.alert('blah');
 	// var url = `https://raw.githubusercontent.com/shouldsee/metacsv-ath-rnaseq/${document.github_sha}/current.csv`;
 	xhttp.open("GET", url, true);
     xhttp.timeout = 120000;
 	xhttp.onreadystatechange = function() {
 	  if (this.readyState == 4 && this.status == 200) {
+
         console.log("...loading csv");
         console.log(this.responseText.slice(100));
-		var dataBuffer = CSVToArray(this.responseText);
-		document.dataBuffer = dataBuffer;
-		var columns = dataBuffer[0];
+		// var dataBuffer = CSVToArray(this.responseText).slice(1);
+        // var columns = dataBuffer[0];
+        var dataBuffer = JSON.parse(this.responseText);
+        dataBuffer = Object.values(dataBuffer)
+        var columns = Object.keys(dataBuffer[0]);
+		window.columns = columns;
+        document.dataBuffer = dataBuffer;
 		var hotSettings = {
-		  data: dataBuffer.slice(1),
+          data:dataBuffer,
+		  // data: dataBuffer.slice(1),
 		  // dataObject,
 		  colHeaders: columns,
-		  columns: [...Array(columns.length).keys()].map(function(v){return ({data:v, width:(window.innerWidth-100)/columns.length})}),
+
+          columns: columns.map(function(v){
+            return (    {
+            "data":v,
+            "width":(window.innerWidth-100)/columns.length
+            })  ;}),
+
+
 		  stretchH: 'all',
 		  width: 805,
 		  autoWrapRow: true,

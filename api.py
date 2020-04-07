@@ -5,7 +5,7 @@ from pydantic import BaseModel
 import pandas as pd
 from path import Path
 DIR = Path('.').realpath()
-
+from collections import OrderedDict
 import subprocess
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="."), name="static")
@@ -13,6 +13,9 @@ app.mount("/static", StaticFiles(directory="."), name="static")
 from typing import Any,List
 import tzlocal
 import datetime
+import joblib
+(DIR /'_server').makedirs_p()
+memory = joblib.Memory(DIR / '_server/cache/',bytes_limit = 1024 * 1024 * 1024 )
 def date_format_iso(obj=None):
     if obj is None:
         obj = datetime.datetime.utcnow()
@@ -30,25 +33,66 @@ def jinja2_format(s,**context):
 	# .update(__builtins__)
 	return Template(s,undefined=StrictUndefined).render(**d)
 
+import requests
+import re,json
+def resolve_sha(sha):
+	if re.match('[0-9a-fA-F]{40}',sha) is not None:
+		return sha
+	else:
+		url="https://api.github.com/repos/shouldsee/metacsv-ath-rnaseq/git/refs"
+		x = json.loads(requests.get(url).text)
+		x = [y["object"]["sha"] for y in x if y["ref"]=="refs/heads/{sha}".format(sha=sha)][0]
+		return x
 
-
-def _get_json(sha, tdir):
+@memory.cache
+def _get_json(sha):
 	from metacsv_ath_rnaseq.header import dict_load_dir
 	import subprocess
 	import requests
-	with open('_TEMP.tar.gz','wb') as f:
-		f.write( requests.get('http://github.com/shouldsee/metacsv-ath-rnaseq/tarball/{sha}'.format(**locals())).content )
-	subprocess.check_output('tar -xzf _TEMP.tar.gz -C .', shell=True)
-	obj = dict_load_dir(tdir.glob('shouldsee-metacsv-*/DATABASE')[0])
+	import tempfile
+	import urllib.request
+	with Path(tempfile.mkdtemp(sha)).realpath() as tdir:
+		debug = 0
+		if debug:
+			obj = dict_load_dir('/tmp/shouldsee-metacsv-ath-rnaseq-c7d8315/DATABASE')
+			return obj
+
+		url = 'http://github.com/shouldsee/metacsv-ath-rnaseq/tarball/{sha}'.format(**locals())
+		# _shell([f'curl -sL {url} | tar -xzf - -C $PWD'])
+
+		urllib.request.urlretrieve(url,'_TEMP.tar.gz')
+		subprocess.check_output('cat _TEMP.tar.gz |tar -xzf - -C .', shell=True)
+#		subprocess.check_output('pigz -dc _TEMP.tar.gz | tar -xf - -C .', shell=True)
+
+		obj = dict_load_dir(tdir.glob('shouldsee-metacsv-*/DATABASE')[0])
+	tdir.rmtree()
 	return obj
+
 
 @app.get("/json/{sha}")
 def get_json(sha):
+	sha = resolve_sha(sha)
+
+	import time
+	t0 = time.time()
+
 	import tempfile
 	from path import Path
-	with Path(tempfile.mkdtemp(sha)).realpath() as tdir:
-		obj = _get_json(sha, tdir)
-	tdir.rmtree()
+	obj = _get_json(sha, )
+	print('[runtime]%.3fs'%(time.time()-t0))
+	return obj
+
+
+@app.get("/simple_json/{sha}")
+def get_simple_json(sha):
+	sha = resolve_sha(sha)
+
+	import tempfile
+	from path import Path
+	from metacsv_ath_rnaseq.models import LocalSample
+	from collections import OrderedDict
+	obj = _get_json(sha)
+	obj = OrderedDict([(k, LocalSample.parse_obj(x).to_simple_dict()) for k,x in obj.items()])
 	return obj
 
 def rec_to_df(obj):
@@ -56,17 +100,17 @@ def rec_to_df(obj):
 	obj = [LocalSample.parse_obj(x) for x in obj.values()]
 	df = pd.concat([pd.Series(x.to_simple_dict()) for x in obj],axis=1).T
 	return df
-# def 
+
 @app.get("/csv/{sha}")
 def get_csv(sha):
+	sha = resolve_sha(sha)
+
 	import io
 	import tempfile
 	from path import Path
 	from metacsv_ath_rnaseq.models import LocalSample
 	import pandas as pd
-	with Path(tempfile.mkdtemp(sha)).realpath() as tdir:
-		obj = _get_json(sha, tdir)
-	tdir.rmtree()
+	obj = _get_json(sha)
 
 	csvBuffer = io.StringIO()
 	df = rec_to_df(obj)
