@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, APIRouter
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, Response, JSONResponse, StreamingResponse
 from pydantic import BaseModel
@@ -8,7 +8,17 @@ DIR = Path('.').realpath()
 from collections import OrderedDict
 import subprocess
 app = FastAPI()
-app.mount("/static", StaticFiles(directory="."), name="static")
+router = APIRouter()
+
+PREFIX = "/metacsv-ath-rnaseq"
+# app.mount(PREFIX)
+app.mount(PREFIX+"/static", StaticFiles(directory="."), name="static");
+# router.mount("/static", StaticFiles(directory="."),);
+# app.mount("/static", StaticFiles(directory="."), name="static")
+@router.get("/edit")
+def edit():
+	with open(DIR/'edit.html','r') as f:
+		return HTMLResponse(f.read())
 
 from typing import Any,List
 import tzlocal
@@ -70,7 +80,7 @@ def _get_json(sha):
 	return obj
 
 
-@app.get("/json/{sha}")
+@router.get("/json/{sha}")
 def get_json(sha):
 	sha = resolve_sha(sha)
 
@@ -84,7 +94,7 @@ def get_json(sha):
 	return obj
 
 
-@app.get("/simple_json/{sha}")
+@router.get("/simple_json/{sha}")
 def get_simple_json(sha):
 	sha = resolve_sha(sha)
 
@@ -102,7 +112,7 @@ def rec_to_df(obj):
 	df = pd.concat([pd.Series(x.to_simple_dict()) for x in obj],axis=1).T
 	return df
 
-@app.get("/csv/{sha}")
+@router.get("/csv/{sha}")
 def get_csv(sha):
 	sha = resolve_sha(sha)
 
@@ -129,7 +139,7 @@ class csvData(BaseModel):
 	github_sha: str
 
 
-@app.post("/auto_pr")
+@router.post("/auto_pr")
 def auto_pull_request( dat:csvData):
 	import os
 	from pprint import pprint
@@ -277,7 +287,7 @@ def df_compare(oldDf,newDf):
 				assert 0,(SAMPLE_ID,count)
 	return labels
 
-@app.post("/auto_pr2")
+@router.post("/auto_pr2")
 def auto_pull_request2( dat:csvData):
 	import os
 	from pprint import pprint
@@ -355,3 +365,5 @@ def auto_pull_request2( dat:csvData):
 		'2>ERROR','1>STDOUT']),shell=True)
 	print('[auto_pr]Done')
 	return Response('[auto_pr]%s'%pr_title)
+
+app.include_router(router,prefix=PREFIX)
