@@ -6,9 +6,9 @@
 <!--
     <script type="text/javascript" src="https://raw.githubusercontent.com/nodeca/pako/master/dist/pako.js"></script>
 https://raw.githubusercontent.com/InvokIT/js-untar/master/build/dist/untar.js
--->
 <script type="text/javascript" src="/static/js/pako.js"></script>
 <script type="text/javascript" src="/static/js/untar.js"></script>
+-->
 
 
 
@@ -62,7 +62,7 @@ https://raw.githubusercontent.com/InvokIT/js-untar/master/build/dist/untar.js
 <div id="hot">Table loading, might take 20 seconds.... </div>
 
 <script>
-{
+function testttt(){
     var test = { my: 'super', puper: [456, 567], awesome: 'pako' };
     var binaryString = pako.deflate(JSON.stringify(test), { to: 'string' });
     var restored = JSON.parse(pako.inflate(binaryString, { to: 'string' }));
@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	var xhttp = new XMLHttpRequest();
     // var url = `/csv/${document.github_sha}`;
-    var url = `/simple_json/${document.github_sha}`;
+    var url = `/metacsv-ath-rnaseq/simple_json/${document.github_sha}`;
     // window.alert('blah');
 	// var url = `https://raw.githubusercontent.com/shouldsee/metacsv-ath-rnaseq/${document.github_sha}/current.csv`;
 	xhttp.open("GET", url, true);

@@ -56,11 +56,15 @@ def resolve_sha(sha):
 
 @memory.cache
 def _get_json(sha):
+	import time
+	t0 = time.time()
+	
 	from metacsv_ath_rnaseq.header import dict_load_dir
 	import subprocess
 	import requests
 	import tempfile
 	import urllib.request
+	from path import Path
 	with Path(tempfile.mkdtemp(sha)).realpath() as tdir:
 		debug = 0
 		if debug:
@@ -77,6 +81,7 @@ def _get_json(sha):
 
 		obj = dict_load_dir(tdir.glob('shouldsee-metacsv-*/DATABASE')[0])
 	tdir.rmtree()
+	print('[runtime]%.3fs'%(time.time()-t0))
 	return obj
 
 
@@ -84,13 +89,10 @@ def _get_json(sha):
 def get_json(sha):
 	sha = resolve_sha(sha)
 
-	import time
-	t0 = time.time()
 
 	import tempfile
 	from path import Path
 	obj = _get_json(sha, )
-	print('[runtime]%.3fs'%(time.time()-t0))
 	return obj
 
 
