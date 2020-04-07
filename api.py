@@ -7,10 +7,18 @@ from path import Path
 DIR = Path('.').realpath()
 from collections import OrderedDict
 import subprocess
-app = FastAPI()
-router = APIRouter()
 
 PREFIX = "/metacsv-ath-rnaseq"
+app = FastAPI(
+	# openapi_url="/api/v1/movies/openapi.json", 
+	openapi_url=PREFIX+"/openapi.json",
+	# /docs",
+	docs_url=PREFIX+"/docs",
+	)
+
+router = APIRouter(
+	)
+
 # app.mount(PREFIX)
 app.mount(PREFIX+"/static", StaticFiles(directory="."), name="static");
 # router.mount("/static", StaticFiles(directory="."),);
@@ -46,12 +54,16 @@ def jinja2_format(s,**context):
 import requests
 import re,json
 def resolve_sha(sha):
-	if re.match('[0-9a-fA-F]{40}',sha) is not None:
+	if re.match('[0-9a-fA-F]{30}',sha) is not None:
 		return sha
 	else:
-		url="https://api.github.com/repos/shouldsee/metacsv-ath-rnaseq/git/refs"
+		# url="https://api.github.com/repos/shouldsee/metacsv-ath-rnaseq/git/refs"
+		# x = json.loads(requests.get(url).text)
+		# x = [y["object"]["sha"] for y in x if y["ref"]=="refs/heads/{sha}".format(sha=sha)][0]
+
+		url="https://api.github.com/repos/shouldsee/metacsv-ath-rnaseq/git/refs/heads/{sha}".format(sha=sha)
 		x = json.loads(requests.get(url).text)
-		x = [y["object"]["sha"] for y in x if y["ref"]=="refs/heads/{sha}".format(sha=sha)][0]
+		x = x["object"]["sha"]
 		return x
 
 @memory.cache
@@ -73,6 +85,7 @@ def _get_json(sha):
 
 		url = 'http://github.com/shouldsee/metacsv-ath-rnaseq/tarball/{sha}'.format(**locals())
 		# _shell([f'curl -sL {url} | tar -xzf - -C $PWD'])
+
 
 		urllib.request.urlretrieve(url,'_TEMP.tar.gz')
 #		subprocess.check_output('pigz -dc _TEMP.tar.gz | tar -xf - -C .', shell=True)
@@ -289,7 +302,7 @@ def df_compare(oldDf,newDf):
 				assert 0,(SAMPLE_ID,count)
 	return labels
 
-@router.post("/auto_pr2")
+# @router.post("/auto_pr2")
 def auto_pull_request2( dat:csvData):
 	import os
 	from pprint import pprint

@@ -3,8 +3,6 @@ metacsv-ath-rnaseq
 
 An open-source community-managed meta-data sheet for Arabidopsis thaliana.
 
-See http://shouldsee.github.io/metacsv-ath-rnaseq
-
 ### Overview
 
 This project aims to provide a better API for retriving meta-data for a public Ath-RNASEQ dataset. 
@@ -12,9 +10,10 @@ Notably this API can be improved by creating Github PR.
 
 ### API endpoints
 
-1. GET http://shouldsee.github.io/metacsv-ath-rnaseq/current.csv
+See http://newflaw.com/metacsv-ath-rnaseq/docs
 
-A csv sheet with fields
+- `/edit`:
+   display a A csv sheet with fields
 
 | Name      | Type   | Comment | Example |
 | ---       | ---    | ---------------------------- | ------  | 
