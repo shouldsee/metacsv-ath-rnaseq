@@ -8,6 +8,13 @@ DIR = Path('.').realpath()
 from collections import OrderedDict
 import subprocess
 
+
+from metacsv_ath_rnaseq.models import LocalSample
+# class LocalSample(LocalSample):
+# 	pass
+
+DEFAULT_BRANCH="data"
+
 PREFIX = "/metacsv-ath-rnaseq"
 app = FastAPI(
 	# openapi_url="/api/v1/movies/openapi.json", 
@@ -19,11 +26,53 @@ app = FastAPI(
 router = APIRouter(
 	)
 
-# app.mount(PREFIX)
+
 app.mount(PREFIX+"/static", StaticFiles(directory="."), name="static");
-# router.mount("/static", StaticFiles(directory="."),);
-# app.mount("/static", StaticFiles(directory="."), name="static")
-@router.get("/edit")
+from fastapi.openapi.utils import get_openapi
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    openapi_schema = get_openapi(
+    	title = "metacsv-ath-rnaseq",
+        # title="Custom title",
+        version="0.0.3",
+        description='''
+
+[Github](https://github.com/shouldsee/metacsv-ath-rnaseq)
+
+This project aims to provide a better API for retriving meta-data for public Ath-RNASEQ datasets. 
+This API can be improved by creating Github PR.
+
+The github branch `shouldsee/metacsv-ath-rnaseq/data` is the current merging head getting updated. 
+It has a directory "/DATABASE/" which is a file-based database that may be updated through:
+  1. the `/edit/` interface
+  1. making a custom PR  
+
+        ''',
+        routes=app.routes,
+    )
+    openapi_schema["info"]["x-logo"] = {
+        "url": "https://fastapi.tiangolo.com/img/logo-margin/logo-teal.png"
+    }
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+app.openapi = custom_openapi
+
+
+app.openapi = custom_openapi
+
+@router.get("/edit",
+	# summary=
+# response_model = HTMLResponse,
+summary='An online csv-based editor using handsontable',
+	
+description=f'''
+An online csv-based editor using handsontable <a href="{PREFIX}/edit">{PREFIX}/edit</a>
+--------------------------------------------------
+
+This editor allows user to filter for keywords, make modifications and create autopr.
+'''
+	)
 def edit():
 	with open(DIR/'edit.html','r') as f:
 		return HTMLResponse(f.read())
@@ -98,18 +147,58 @@ def _get_json(sha):
 	return obj
 
 
-@router.get("/json/{sha}")
-def get_json(sha):
+@router.get("/db_json/{sha}",
+    summary="Return a db-json-formatted database for github commit-sha1/branch-name {sha}",
+    description='''
+## Return a json-formatted database for a commit-sha1/branch-name
+
+- `db_json` is the direct dump of the database according to its schema.
+- `sha`: a github commit-sha1/branch-name that has a `/DATABASE/` directory
+  - example: "branch"
+    ''',
+	)
+def get_db_json(sha):
 	sha = resolve_sha(sha)
-
-
 	import tempfile
 	from path import Path
 	obj = _get_json(sha, )
 	return obj
 
+@router.get("/db_json/{sha}/{SAMPLE_ID}",
+    summary="Return a db-json-formatted record {sha}",
+    description='''
+## Return a db-json-formatted database for a commit-sha1/branch-name
 
-@router.get("/simple_json/{sha}")
+- `db_json` is the direct dump of the database according to its schema.
+- `sha`: a github commit-sha1/branch-name that has a `/DATABASE/` directory
+  - example: "branch"
+    ''',
+    response_model = LocalSample,
+	)
+def get_db_json_record(sha,SAMPLE_ID):
+	sha = resolve_sha(sha)
+	import tempfile
+	from path import Path
+	obj = _get_json(sha, )[SAMPLE_ID]
+	return obj
+
+
+
+
+@router.get("/simple_json/{sha}",
+    # response_model=Item,
+    summary="Return a simple_json-formatted database for github commit-sha1/branch-name {sha}",
+    description='''
+## Return a simple_json-formatted database for a commit-sha1/branch-name
+
+- `simple_json` is a view for `LocalSample` suitable for edit and not storage.
+- `sha`: a github commit-sha1/branch-name that has a `/DATABASE/` directory
+  - example: "branch"
+
+    ''',
+    # description="Create an item with all the information, name, description, price, tax and a set of unique tags",
+
+	)
 def get_simple_json(sha):
 	sha = resolve_sha(sha)
 
@@ -121,12 +210,45 @@ def get_simple_json(sha):
 	obj = OrderedDict([(k, LocalSample.parse_obj(x).to_simple_dict()) for k,x in obj.items()])
 	return obj
 
+
+
+@router.get("/simple_json/{sha}/{SAMPLE_ID}",
+    # response_model=Item,
+    summary="Return a simple_json-formatted database for github commit-sha1/branch-name {sha}",
+    description='''
+## Return a simple_json-formatted database for a commit-sha1/branch-name
+
+- `simple_json` is a view for `LocalSample` suitable for edit and not storage.
+- `sha`: a github commit-sha1/branch-name that has a `/DATABASE/` directory
+  - example: "branch"
+
+    ''',
+    # description="Create an item with all the information, name, description, price, tax and a set of unique tags",
+
+	)
+def get_simple_json_record(sha,SAMPLE_ID):
+	sha = resolve_sha(sha)
+
+	import tempfile
+	from path import Path
+	from metacsv_ath_rnaseq.models import LocalSample
+	from collections import OrderedDict
+	# obj = _get_json(sha)
+	# return  LocalSample.parse_obj(obj[SAMPLE_ID]).to_simple_dict
+	# return {'type':type(obj)}
+	obj = get_db_json_record(sha,SAMPLE_ID)
+	# return obj
+	return  LocalSample.parse_obj(obj).to_simple_dict()
+	# return {'type':type(obj).__name__}
+	# obj = LocalSample.parse_obj(obj).to_simple_dict()
+	# return obj
+
+
 def rec_to_df(obj):
 	from metacsv_ath_rnaseq.models import LocalSample
 	obj = [LocalSample.parse_obj(x) for x in obj.values()]
 	df = pd.concat([pd.Series(x.to_simple_dict()) for x in obj],axis=1).T
 	return df
-
 @router.get("/csv/{sha}")
 def get_csv(sha):
 	sha = resolve_sha(sha)
@@ -154,7 +276,13 @@ class csvData(BaseModel):
 	github_sha: str
 
 
-@router.post("/auto_pr")
+@router.post("/auto_pr",
+	description='''
+Private API for `/edit`
+------------------------
+	'''
+
+	)
 def auto_pull_request( dat:csvData):
 	import os
 	from pprint import pprint
