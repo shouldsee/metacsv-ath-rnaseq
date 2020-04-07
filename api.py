@@ -61,7 +61,9 @@ def _get_json(sha):
 		# _shell([f'curl -sL {url} | tar -xzf - -C $PWD'])
 
 		urllib.request.urlretrieve(url,'_TEMP.tar.gz')
-		subprocess.check_output('pigz -dc _TEMP.tar.gz | tar -xf - -C .', shell=True)
+#		subprocess.check_output('pigz -dc _TEMP.tar.gz | tar -xf - -C .', shell=True)
+		subprocess.check_output('cat _TEMP.tar.gz |tar -xzf - -C .', shell=True)
+#		subprocess.check_output('pigz -dc _TEMP.tar.gz | tar -xf - -C .', shell=True)
 
 		obj = dict_load_dir(tdir.glob('shouldsee-metacsv-*/DATABASE')[0])
 	tdir.rmtree()

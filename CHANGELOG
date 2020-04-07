@@ -2,6 +2,7 @@
 - optimised speed in 
   - header.dict_load_dir()
   - edit.html
+  - using joblib.Memory for caching
 
 # 0.0.2
 - Changed Database layout from a csv file to a embedded directory tree
