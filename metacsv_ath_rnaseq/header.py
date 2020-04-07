@@ -11,6 +11,8 @@ class Path(_Path):
 		return self
 	def dump_dict(obj):
 		return dict_dump_dir(obj, self)
+	def scandir(self,):
+		return os.scandir(self)
 
 def dict_dump_dir(obj, fn):
 	this = dict_dump_dir
@@ -24,7 +26,7 @@ def dict_dump_dir(obj, fn):
 					f.write('\n'.join(obj.keys()))
 			for k,v in obj.items():
 				this(v, fn / k)
-		elif isinstance(obj, list):
+		elif isinstance(obj, (tuple,list)):
 			for k,v in enumerate(obj):
 				this(v, fn / str(k))				
 	elif isinstance(obj, (str,int,float)):
@@ -34,8 +36,19 @@ def dict_dump_dir(obj, fn):
 		assert 0,("type not understood",type(obj),fn)
 
 
-def safe_eval(s):
-	return eval(s)
+types = [
+	('str',str),
+	('int',int),
+	('float',float),
+	('list',list),
+	('tuple',tuple),
+	('dict',dict),
+	('OrderedDict',OrderedDict),
+]
+types = dict(types)
+def safe_eval(s,types=types):
+	return types[s]
+	# return eval(s)
 
 # def common_open(fn,*a):
 
@@ -60,6 +73,8 @@ class TarPath(object):
 class PathLike(object):
 	def __repr__(self):
 		return 'PathLike(data={self.data!s}, type={self.type.__name__!s})'.format(**locals())
+	def __str__(self):
+		return self.data.__str__()
 	def __init__(self, obj):
 		self.index      =  None
 		self.tarfile    =  None
@@ -78,6 +93,7 @@ class PathLike(object):
 		self.cls        =  PathLike
 		# self.tarfile    =  getattr(self.data,'tarfile',None)
 		# self.data.index = None
+
 	def extractfile(self,*a):
 		return self.data.extractfile(*a)
 
@@ -148,7 +164,8 @@ class PathLike(object):
 			return fs
 		else:
 			assert 0,(self.type,self.data)
-
+	def scandir(self,):
+		return os.scandir(self.data)
 	def __truediv__(self,other):
 		if isinstance(self.data, Path):
 			return self.data / other
@@ -159,35 +176,51 @@ class PathLike(object):
 			return self.tarfile.index[name]
 
 from pprint import pprint
-
+import os
+def _path_join(fn,x):
+	return "%s/%s"%(fn,x)
 def dict_load_dir(fn):
-	this = dict_load_dir
-	fn = PathLike(fn) if not isinstance(fn,PathLike) else fn
+	fn = Path(fn)
 	if not fn.exists():
 		raise Exception("Path %s does not exists" % fn)
 	elif fn.isfile():
 		with fn.open('rb') as f:
 			buf = f.read().decode()
+
 			cls, buf = buf.split(',',1)
 			cls = safe_eval(cls)
 			obj = cls(buf)
 	elif fn.isdir():
-		typename = (fn/'_dir_type').open('rb').read().decode().strip()
-		cls = safe_eval(typename)
-		fs = [x.basename() for x in fn.listdir() if x.basename() not in ['_dir_type','_dir_order']]
+		with Path(_path_join(fn,'_dir_type')).open('rb') as f:
+			typename = f.read().decode().strip()
+			cls = safe_eval(typename)
+		# fs = list(fn.scandir())
+		# fs = [Path(x.name) for x in fs]		
+		fs = [Path(x.name) for x in fn.scandir()]
+		fs = [x for x in fs if x not in ['_dir_type','_dir_order']]
 		if cls == list:
 			obj = [None] * len(fs)
 			for x in fs:
-				obj.__setitem__( int( x.basename()),  this(fn / x) )
+				_x = _path_join(fn,x)
+				v =  dict_load_dir( _x)
+				obj.__setitem__( int( x ), v )
 		elif issubclass( cls, dict):
 			obj = cls()
-			if issubclass(cls, OrderedDict):
-				od = (fn/'_dir_order').open('rb').read().decode().splitlines()
-				assert set(fs) == set(od),pprint((fs,od))
-				fs = od
-				
+			# if issubclass(cls, OrderedDict):
+			if cls is OrderedDict:
+				with (fn/'_dir_order').open('rb') as f:
+					od = f.read().decode().splitlines()
+					assert set(fs) == set(od),pprint((fs,od))
+					fs = od
 			for x in fs:
-				obj.__setitem__( x,  this(fn / x) )
+				_x = _path_join(fn,x)
+				v = dict_load_dir(_x)
+				obj.__setitem__( x,  v )
 		else:
 			raise RoutineTypeUndefined(cls)
 	return obj
+
+def reloader():
+	from importlib import reload; import metacsv_ath_rnaseq.header; reload(metacsv_ath_rnaseq.header); from metacsv_ath_rnaseq.header import dict_load_dir 
+	# %lprun -f dict_load_dir dict_load_dir("/tmp/shouldsee-metacsv-ath-rnaseq-c7d8315/DATABASE/")
+	# %lprun -f dict_load_dir dict_load_dir("/tmp/shouldsee-metacsv-ath-rnaseq-c7d8315/DATABASE/")

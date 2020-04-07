@@ -1,3 +1,8 @@
+# 0.0.3
+- optimised speed in 
+  - header.dict_load_dir()
+  - edit.html
+
 # 0.0.2
 - Changed Database layout from a csv file to a embedded directory tree
 - need to optimise for speed

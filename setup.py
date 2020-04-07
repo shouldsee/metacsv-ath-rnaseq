@@ -7,7 +7,7 @@ assert sys.version_info >= (3,6),('Requires python>=3.6, found python==%s'%('.'.
 
 config = dict(
 	name='metacsv_ath_rnaseq',
-	version = '0.0.2',
+	version = '0.0.3',
 	packages=['metacsv_ath_rnaseq'],
 	python_requires = ">= 3.6",
 	license='MIT',

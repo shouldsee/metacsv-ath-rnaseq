@@ -1,6 +1,7 @@
 # local test env
 _env/
 _build/
+_server/
 *.outward_edges
 
 
