@@ -8,6 +8,15 @@ from collections import OrderedDict
 import subprocess
 from metacsv_ath_rnaseq.models import LocalSample
 
+from jinja2 import Template, StrictUndefined
+def jinja2_format(s,**context):
+	# d = context.copy()
+	d = {}
+	# d = __builtins__.copy()
+	d.update(context)
+	# .update(__builtins__)
+	return Template(s,undefined=StrictUndefined).render(**d)
+
 '''
 git fetch origin refs/heads/master:refs/remotes/origin/master
 '''
@@ -30,14 +39,14 @@ router = APIRouter(
 	)
 app.mount(PREFIX+"/static", StaticFiles(directory="."), name="static");
 from fastapi.openapi.utils import get_openapi
-def custom_openapi():
+def custom_openapi(PREFIX=PREFIX):
     if app.openapi_schema:
         return app.openapi_schema
     openapi_schema = get_openapi(
     	title = "metacsv-ath-rnaseq",
         # title="Custom title",
         version=read_close("VERSION").strip(),
-        description='''
+        description=jinja2_format('''
 
 <img width="16" height="16" src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"></img>[Github](https://github.com/shouldsee/metacsv-ath-rnaseq)
 
@@ -48,19 +57,20 @@ understanding of the plant transcriptome.
 
 Choose one of:
 
-1. Using hosted api endpoint at `/csv/`,`/simple_json/`,`/db_json/`
-1. Use `metacsv_ath_rnaseq.utils.dict_from_db_branch(user, repo, sha)`
-1. Or clone the github branch `shouldsee/metacsv-ath-rnaseq:data` and 
+- Using hosted api endpoint at `/csv/{sha}`,`/simple_json/{sha}`,`/db_json/{sha}`
+- Use `metacsv_ath_rnaseq.utils.dict_from_db_branch(user, repo, sha)`
+- Or clone the github branch `shouldsee/metacsv-ath-rnaseq:data` and 
 load using `metacsv_ath_rnaseq.header.dict_from_dir("./DATABASE")`
+- use the download button in the [`/edit`]({{PREFIX}}/edit) endpoint
 
 ## Edit Data
 
 The github branch `shouldsee/metacsv-ath-rnaseq/data` is the current merging head getting updated. 
 It has a directory "/DATABASE/" which is a file-based database that may be updated through one of:
 
-1. Manually edit using the `/edit` endpoint
-1. POST request the `/auto_pr` endpoint (not documented)
-1. Manually create a PR to "shouldsee/metacsv-ath-rnaseq:data" after editing the "./DATABASE" directory in your branch.
+- Manually edit using the [`/edit`]({{PREFIX}}/edit) endpoint
+- POST request the `/auto_pr` endpoint (not documented)
+- Manually create a PR to "shouldsee/metacsv-ath-rnaseq:data" after editing the "./DATABASE" directory in your branch.
 
 
 ## Install python package:
@@ -68,7 +78,7 @@ It has a directory "/DATABASE/" which is a file-based database that may be updat
 - Require Python >= 3.6 (check `pip -V` )
 - `pip install metacsv-ath-rnaseq@https://github.com/shouldsee/metacsv-ath-rnaseq/tarball/master`
 
- ''',
+ ''',**locals()),
         routes=app.routes,
     )
     openapi_schema["info"]["x-logo"] = {
@@ -117,14 +127,6 @@ def date_format_iso(obj=None):
     return s
 
 
-from jinja2 import Template, StrictUndefined
-def jinja2_format(s,**context):
-	# d = context.copy()
-	d = {}
-	# d = __builtins__.copy()
-	d.update(context)
-	# .update(__builtins__)
-	return Template(s,undefined=StrictUndefined).render(**d)
 
 
 from metacsv_ath_rnaseq.utils import resolve_repo_sha
@@ -244,6 +246,11 @@ def rec_to_df(obj):
 	obj = [LocalSample.parse_obj(x) for x in obj.values()]
 	df = pd.concat([pd.Series(x.to_simple_dict()) for x in obj],axis=1).T
 	return df
+
+# @router.get("/csv/")
+# def _();
+# 	return get_csv("data")
+
 @router.get("/csv/{sha}")
 def get_csv(sha):
 	sha = resolve_sha(sha)
