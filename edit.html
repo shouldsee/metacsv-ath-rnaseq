@@ -20,7 +20,12 @@ https://raw.githubusercontent.com/InvokIT/js-untar/master/build/dist/untar.js
 <script src="/metacsv-ath-rnaseq/static/js/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 <script src="/metacsv-ath-rnaseq/static/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 
-<style type="text/css">body {  padding-top: 70px;}</style>
+<style type="text/css">
+body {  padding-top: 80px;}
+/*@media screen and (min-width: 768px) {
+    body { padding-top: 100px; }
+}
+*/</style>
 
 <!-- 
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
@@ -33,14 +38,14 @@ https://raw.githubusercontent.com/InvokIT/js-untar/master/build/dist/untar.js
 <div class="container">
 
 <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark" id="navbar">
-  <a class="navbar-brand" href="/metacsv-ath-rnaseq/docs/">metacsv-ath-rnaseq</a>
+  <a class="navbar-brand" href="/metacsv-ath-rnaseq/">metacsv-ath-rnaseq</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
   <div class="collapse navbar-collapse" id="navbarCollapse">
     <ul class="navbar-nav mr-auto">
         <li>
-            <button type="button" class="btn btn-primary size-medium bg-green text-white shadow hover-moveup" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">Create Pull Request</button>
+            <button type="button" class="btn btn-primary size-medium bg-green text-white shadow hover-moveup" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">Save</button>
                 
         </li>
         <li>
@@ -48,8 +53,15 @@ https://raw.githubusercontent.com/InvokIT/js-untar/master/build/dist/untar.js
         </li>      
         <li class="nav-item active">
             <input id="github-branch-input" style="width: 300px; margin-left: 5px;"></input>
-            <button id="github-branch-button" class="btn btn-primary" style="margin-left: 5px;">Checkout Branch (Disabled)</button>
         </li>
+        <li>
+            <button id="github-branch-button" class="btn btn-primary" style="margin-left: 5px;">Checkout Branch(dev)</button>
+        </li>
+        <li>
+          <input class="mr-sm-2" type="text" placeholder="try 'leaf'" aria-label="Search" id="search">
+            
+        </li>
+
         <!--
       <li class="nav-item">
         <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
@@ -58,9 +70,11 @@ https://raw.githubusercontent.com/InvokIT/js-untar/master/build/dist/untar.js
 
     </ul>
     <form class="form-inline mt-2 mt-md-0">
-        <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Search (try "leaf"):</a>
-      <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search" id="search">
-<!--      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button> -->
+<!--     
+      <input class="mr-sm-2" type="text" placeholder="try 'leaf'" aria-label="Search" id="search">
+        <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Search:</a>
+ <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+  -->
     </form>
   </div>
 </nav>
@@ -71,26 +85,64 @@ https://raw.githubusercontent.com/InvokIT/js-untar/master/build/dist/untar.js
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">New message</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Saving</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
+        <h8> Make sure the logined user has correct permission to a pushed repository</h8>
+        <br>
+        <br>
         <form id="form-elem">
-          <div class="form-group">
-            <label>Email</label>
-            <input for="email" value="user@email.com"></input>
-          </div>
-          <div class="form-group">
-            <label>PR Tag</label>
-            <input for="pr_tag" value="pr-tag"></input>
-          </div>
+          <table>
+              <tr>
+                  <th>
+                      <label>Target branch</label>
+                  </th>
+                  <th>
+                      <input for="github_target_branch" id="modal-target-branch" readonly></input> (read-only)                  
+                  </th>
+              </tr>
+              <tr>
+                  <th>
+                      <label>github login</label>
+                  </th>
+                  <th>
+                      <input for="github_login" value="metacsv-bot" readonly></input> (read-only) 
+                  </th>
+              </tr>
+              <tr>
+
+                  <th>
+                      <label>Email</label>
+                  </th>
+                  <th>
+                      <input for="email" value="user@email.com"></input>
+                  </th>
+              </tr>
+              <tr>
+
+                  <th>
+                      <label>PR Tag</label>
+                  </th>
+                  <th>
+                      <input for="pr_tag" value="pr-tag"></input>
+                  </th>
+              </tr>
+          </table>
+
+              <label>Progress</label>
+              <br>
+              <code id="modal-progress" style="overflow: visible;">              
+              </code> 
+
         </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" id="export-string-modal" class="btn btn-primary">Create PR</button>
+        <button type="button" id="export-gh-new-pr" class="btn btn-primary">Create PR</button>
+        <button type="button" id="export-gh-push" class="btn btn-primary">Push to Branch</button>
       </div>
     </div>
   </div>
@@ -107,75 +159,16 @@ https://raw.githubusercontent.com/InvokIT/js-untar/master/build/dist/untar.js
 </body>
 
 <script>
-// function testttt(){
-//     var test = { my: 'super', puper: [456, 567], awesome: 'pako' };
-//     var binaryString = pako.deflate(JSON.stringify(test), { to: 'string' });
-//     var restored = JSON.parse(pako.inflate(binaryString, { to: 'string' }));
-
-// };
-
-
-
-// function load_tar_gz(url){
-//     url = 'https://github.com/shouldsee/metacsv-ath-rnaseq/tarball/master';
-//     var xhr = new XMLHttpRequest();
-//     var req = xhr;
-//     xhr.open("GET",`https://cors-anywhere.herokuapp.com/${url}`,true);
-//     // https://codeload.github.com/mafintosh/tar-stream/legacy.tar.gz/master",true);
-//     xhr.responseType = "arraybuffer";
-//     function stringToArrayBuffer(str) {
-//         // workaround suggested by https://stackoverflow.com/a/27131778/8083313
-//         var buf = new ArrayBuffer(str.length);
-//         var bufView = new Uint8Array(buf);
-//         for (var i=0, strLen=str.length; i<strLen; i++) {
-//             bufView[i] = str.charCodeAt(i);
-//         }
-//         return buf;
-//     }
-//     function dirname(path) {
-//          return path.match(/.*\//)[0];
-//          // .toString();
-//     }    
-//     // xhr.onreadystatechange = function(){
-//     xhr.onload = function(){
-//         var curr;
-//         window.curr = curr = this.response;
-//         window.curr = curr = pako.ungzip( curr, 
-//             { to: 'string' }
-//             );
-//         var curr = stringToArrayBuffer(curr);
-//         untar( curr )
-//             .then(function(extractedFiles) {
-//                 console.log(extractedFiles[0].name);
-//                 console.log("extacting2");                
-//                 window.extractedFiles = extractedFiles;
-//                 extractedFiles.map(function(fn){
-//                     window.fn = fn;
-//                     dir = dirname(fn.name);
-//                     if (fn.name.startsWith("shouldsee-metacsv-ath-rnaseq-dc5c288/DATABASE"))
-//                     {
-//                         console.log(fn.name);
-
-//                     };
-//                     // if (dir==="shouldsee-metacsv-ath-rnaseq-dc5c288/DATABASE" & dir!=fn.name){
-//                     //     console.log(fn.name);
-//                     // };
-//                 })
-//             });
-
-//     }
-//     xhr.send();
-
-// }
 
 
 _stderr = function(str){
     console.log(str);
     document.getElementById('hot').insertAdjacentHTML( 'beforeend', "<br>"+str);
+    // document.getElementById('modal-progress').insertAdjacentHTML( 'beforeend', "<br>"+str);
 }
 
 {
-    document.getElementById("github-branch-input").value ="shouldsee/metacsv-ath-rnaseq:data";
+    document.getElementById("modal-target-branch").value = document.getElementById("github-branch-input").value ="shouldsee/metacsv-ath-rnaseq:data";
     var xhr = new XMLHttpRequest();
     var branch = "data";
     var url = `https://api.github.com/repos/shouldsee/metacsv-ath-rnaseq/git/refs/heads/${branch}`;
@@ -199,6 +192,26 @@ _stderr = function(str){
 // var hotSettings = {};
 // var hot = new Handsontable(hotElement, hotSettings);
 
+function key_value_dict(columns,rowData){
+    array = array.map(function(rowData){
+        out = {};
+        for (i=0; i<=columns.length; i++){
+            out[columns[i]] = rowData[i];
+        }
+        return(out);
+    });
+    return (array)
+}
+
+function db_to_csv(array,columns){
+    return Object.values(array).map(function(x){
+        return columns.map(function(k){
+            return x[k];
+        });
+    });
+}
+window.db_to_csv=db_to_csv;
+
 document.addEventListener('DOMContentLoaded', function() {
 
 	var xhttp = new XMLHttpRequest();
@@ -215,18 +228,13 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log(this.responseText.slice(0,100));
 		// var dataBuffer = CSVToArray(this.responseText).slice(1);
         // var columns = dataBuffer[0];
-        var dataBuffer = JSON.parse(this.responseText);
-        dataBuffer = Object.values(dataBuffer)
-        var columns = Object.keys(dataBuffer[0]);
-		window.columns = columns;
-        document.dataBuffer = dataBuffer;
+        var hashDataBuffer = JSON.parse(this.responseText);
+        document.hashDataBuffer = hashDataBuffer;
+        window.columns = document.columns = columns = Object.keys(Object.values(hashDataBuffer)[0]);
 		var hotSettings = {
-          // fixedRowsTop: 1,
-          data:dataBuffer,
-		  // data: dataBuffer.slice(1),
-		  // dataObject,
+          data: Object.values(hashDataBuffer),
 		  colHeaders: columns,
-
+          // index: dataBuffer.map(function(x){return(x["SAMPLE_ID"])}),
           columns: columns.map(function(v){
             return (    {
             "data":v,
@@ -237,29 +245,46 @@ document.addEventListener('DOMContentLoaded', function() {
             // (window.innerWidth-100)/columns.length
             "width":(window.innerWidth-100)/columns.length
             })  ;}),
-
-
-		  // stretchH: 'all',
-		  // width: 805,
 		  autoWrapRow: true,
-          // height: "100%",
           height:window.innerHeight -50 - document.getElementById("navbar").offsetHeight,
-
-		  // height: document.getElementById("main").innerHeight,
-
-          // "100%",
-		  // maxRows: 22,
 		  manualRowResize: true,
 		  manualColumnResize: true,
 		  rowHeaders: true,
-		  // colHeaders: true,
 		  manualRowMove: true,
 		  manualColumnMove: true,
 		  contextMenu: true,
 		  filters: true,
 		  dropdownMenu: true,
-		  exportFile: true
-		};    
+		  exportFile: true,
+          search:true,
+          beforeChange: function (changes, source){
+            var hot = this;
+            changes.map(function(change){
+
+                row=change[0];
+                col=change[1];
+                before = change[2];
+                after  = change[3];
+                // window.blah = this;
+                index = hot.getDataAtRow(row)[0]
+                console.log([index].concat(change));
+                if(before===after){
+                    //pass
+                }else{
+                    console.log(index);
+                    x = document.hashDataBuffer[index];
+                    // console.log(x);
+                    x[col] = after;
+                    document.hashDataBuffer[index][col]=after;
+                    // console.log(x);
+                    // document.csvDataBuffer[row][col]=after;
+                    console.log("changed "+index);
+                };
+            });
+
+            // console.log([source].concat(changes));
+          },
+        }
 		// container2 = document.getElementById('hot')
 		document.hot = new Handsontable(
 			document.getElementById('hot'),
@@ -267,10 +292,14 @@ document.addEventListener('DOMContentLoaded', function() {
 	  	// console.log(this.responseText)
 	    // document.getElementById("demo").innerHTML = this.responseText;
         document.csvDataBuffer = document.hot.getData();
+        // Handsontable.hooks.add('beforeChange', [function(data){console.log(data);}],document.hot);
+        // Handsontable.hooks.add('afterChange', [function(data){console.log(data);}],document.hot);
+
 	  }else{
-        _stderr( this );
+        _stderr([this.readyState,this.status]);
 	  }
-	};
+    };
+
 	xhttp.send();
 
 
@@ -289,15 +318,23 @@ function zip(arrays) {
 
 window.zip=zip;
 
- function filter(search) {
-    var row, r_len;
-        var data = document.csvDataBuffer;
+
+
+Handsontable.dom.addEvent(document.getElementById('search'), 'keyup', function(event) {
+
+  var hot = document.hot;
+  var search_str = (('' + this.value).toLowerCase());
+  var row, r_len;
+        var data = db_to_csv(document.hashDataBuffer,document.columns);
+        // var data = document.csvDataBuffer;
         var array = [];
-    for (row = 0, r_len = data.length; row < r_len; row++) {
+        var index = [];
+        for (row = 0, r_len = data.length; row < r_len; row++) {
             for(col = 0, c_len = data[row].length; col < c_len; col++) {
       // console.log(data[row][col] + " " + search);
-                if(('' + data[row][col]).toLowerCase().indexOf(search) > -1) {
+                if(('' + data[row][col]).toLowerCase().indexOf(search_str) > -1) {
             array.push(data[row]);
+            // index.push(row);
           break;
         }
             }
@@ -310,23 +347,53 @@ window.zip=zip;
             return(out);
         });
         // document
-        document.hot.loadData(array);
-        // document.hot.loadData();
-  }
+  hot.loadData(array);
+  // hot.showRows(index);
+  var search = hot.getPlugin('search');
+  var queryResult = search.query(search_str);
+  hot.render();
+});
   
-  Handsontable.dom.addEvent(document.getElementById('search'), 'keyup', function() {
-    filter(('' + this.value).toLowerCase());
+
+// Handsontable.dom.addEvent(searchFiled, 'keyup', function (event) {
+// });
+function temp(){
+
+Handsontable.dom.addEvent(document.getElementById('search'), 'keyup', function(event) {
+
+  var hot = document.hot;
+    // filter(('' + this.value).toLowerCase());
+  // var plugin = hot.getPlugin('hiddenRows');  
+  // plugin.hideRows([0,1,2,3,4,5]);  
+  // hot.render();
+
+  var search = hot.getPlugin('search');
+  var queryResult = search.query(this.value);
+  hot.render();
+
   });
+}
+
+function modal_logger(s){document.getElementById('modal-progress').innerText+=s; } 
 
 document.getElementById("export-csv").addEventListener("click", function(event) { document.hot.getPlugin("exportFile").downloadFile("csv", {filename: "metacsv-ath-rnaseq.edit.csv"});})
-document.getElementById("export-string-modal").addEventListener("click", function(event) {
-    // console.log("hi");
+document.getElementById("export-gh-new-pr").addEventListener("click", function(event) {
+    post_update_ref({try_push:0, stderr: modal_logger});
+});
+document.getElementById("export-gh-push").addEventListener("click", function(event) {
+    post_update_ref({try_push:1, stderr: modal_logger});
+});
+
+
+function post_update_ref(config){
+
     var dat = document.getElementById('form-elem');
     var dict = {};
     for(i=0;i<dat.elements.length;i++){
         dict[dat.elements[i].attributes.for.value] = dat.elements[i].value;
 
     };
+
     var meta = dict;
     window.dict = dict;
     console.log(dict);
@@ -335,23 +402,31 @@ document.getElementById("export-string-modal").addEventListener("click", functio
     xhr.open("POST", "/metacsv-ath-rnaseq/auto_pr/", true);
     xhr.setRequestHeader("Content-Type", "application/json")
     xhr.onload = function() {
-        window.alert('Update successful!\nResponseText:'+this.responseText);
+        config.stderr('Request successful!\nResponseText:'+this.responseText+'\n');
     }
     xhr.onerror = function(){
-        window.alert("Update failed!");        
+        config.stderr("Request failed!");        
     }
-    var data=document.hot.getData();
-    xhr.send(JSON.stringify({
+    var formDict = {
         "type":"csvBuffer",
-        "data":data,
+        // "data":null,
+        "data":db_to_csv(document.hashDataBuffer,document.columns),
+        // document.csvDataBuffer,
         "columns":document.hot.getColHeader(),
         "email":meta.email,
         "pr_tag":meta.pr_tag,
-        "github_sha":document.github_sha
-    }));
-
-    // xhr.send(JSON.stringify(document.hot.getData()));
-});
+        "github_sha":document.github_sha,
+        "try_push": config.try_push,
+    };
+    if(config.try_push==true){
+        config.stderr("Sending POST request for a Push\n");
+    }else{
+        config.stderr("Sending POST request for a new PR\n");
+    };
+    console.log(formDict);
+    // formDict["data"]=data;
+    xhr.send(JSON.stringify(formDict));
+}
 
 
 });

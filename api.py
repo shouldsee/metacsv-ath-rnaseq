@@ -8,6 +8,9 @@ from collections import OrderedDict
 import subprocess
 from metacsv_ath_rnaseq.models import LocalSample
 
+'''
+git fetch origin refs/heads/master:refs/remotes/origin/master
+'''
 def read_close(fn,encoding=None):
 	with open(fn,"rb") as f:
 		return f.read().decode(encoding) if encoding else f.read().decode()
@@ -128,10 +131,13 @@ from metacsv_ath_rnaseq.utils import resolve_repo_sha
 def resolve_sha(sha):
 	return resolve_repo_sha('shouldsee', 'metacsv-ath-rnaseq', sha)
 
-from metacsv_ath_rnaseq.utils import dict_from_db_branch
+from metacsv_ath_rnaseq.utils import dict_from_db_branch, UniqueGlobError
 @memory.cache
 def _get_json(sha):
-	return dict_from_db_branch("shouldsee","metacsv-ath-rnaseq",sha, )
+	try:
+		return dict_from_db_branch("shouldsee","metacsv-ath-rnaseq", sha, )
+	except UniqueGlobError as e:
+		raise HTTPException(status_code=500,detail=f'Cannot find /DATABASE/ from commit identified by {sha}')
 
 
 @router.get("/db_json/{commit_sha_or_branch}",
@@ -264,6 +270,7 @@ class csvData(BaseModel):
 	pr_tag: str
 	gh_token: str = None
 	github_sha: str
+	try_push: int = 0
 
 
 @router.post("/auto_pr",
@@ -285,7 +292,7 @@ def auto_pull_request( dat:csvData):
 	isotime  = date_format_iso()
 	pr_title ='{dat.pr_tag}_{dat.email}_{isotime}'
 	pr_title = pr_title.format(**locals())
-	branch = re.sub('[^0-9a-zA-Z\-_]','-',pr_title)
+	new_branch = re.sub('[^0-9a-zA-Z\-_\@\.]','-',pr_title)
 	base_branch='bysha1_{dat.github_sha}'.format(**locals())
 
 	if 0:
@@ -320,7 +327,7 @@ def auto_pull_request( dat:csvData):
 		echo https://${GH_TOKEN}:x-oauth-basic@github.com >.cred;
 		git config credential.helper 'store --file .cred'
 		git config user.email metacsv-bot@protonmail.com
-		git config user.name metacsv-bot
+		git config user.name  metacsv-bot
 
 		set -euxo pipefail;
 		git checkout -B ${base_branch} && git push origin ${base_branch} 2>ERROR
@@ -354,33 +361,61 @@ def auto_pull_request( dat:csvData):
 			pd.Series(labels).to_frame('STATUS').merge(left_index=True,right_index=True,how='left',right=newDf.set_index('SAMPLE_ID')).to_html(f)
 			f.write('\n\n')
 
-
 		CMD = '''
-		{
+			set -eux;
+		# {
 			GH_TOKEN={{GH_TOKEN}}
-			branch={{branch}}
+			new_branch={{new_branch}}
 			DIR={{_DIR}}
-			# base_branch={{base_branch}}
-			base_branch=data
+			target_branch=data
 			pr_msg_file={{pr_msg_file}}
+			try_push={{dat.try_push}}
 			HUB_VERBOSE=1
 
-			set -euxo pipefail;
+			# set -o pipefail;
 			export GITHUB_TOKEN=${GH_TOKEN}
-			git checkout -B "${branch}"
+			git checkout -B "${new_branch}"
 			git add DATABASE
-			git commit -m "${branch}"
-			${DIR}/bin/hub pull-request --base shouldsee:${base_branch} -p --file ${pr_msg_file}
-		} 2>ERROR
+			git commit -m "${new_branch}" 
 
+			rm -f RET; touch RET;
+			if [[ ${try_push} -eq 1 ]]
+			then
+			    { 
+			    	git push origin ${new_branch}:${target_branch} && echo PUSH_SUC >>RET; 
+			    } || { 
+			    	echo PUSH_FAIL>> RET
+			    	${DIR}/bin/hub pull-request --base shouldsee:${target_branch} -p --file ${pr_msg_file} && echo PR_SUC>>RET; 
+			    }
+			else
+			    ${DIR}/bin/hub pull-request --base shouldsee:${target_branch} -p --file ${pr_msg_file} && echo PR_SUC>>RET; 
+			fi
+		# } 2>ERROR
 		rm -f .cred
 		'''
 		CMD = [jinja2_format(CMD,**locals())]
-		_shell(CMD)
-
+		res = _shell(CMD).decode().rstrip().splitlines()[-1]
+		# pprint(CMD[0].splitlines())
+		with open('RET','r') as f:
+			ret = f.read().splitlines()
 	tdir.rmtree()
 	print('[auto_pr]Done')
-	return Response('[auto_pr]%s'%pr_title)
+	if "PUSH_SUC" in ret or "PR_SUC" in ret:
+		return Response("%r:%s"%(ret,pr_title))
+	else:
+		return Response("[errored]%r:%s"%(ret,pr_title))
+	# if 'PUSH_SUC' in ret:
+	# 	return Response('[pushed]%s'%pr_title)
+	# elif 'PUSH_FAIL' in ret:
+	# 	return Response('%r%s'%(ret,pr_title))
+	# if res =='PR':
+	# 	return Response('[auto_pr]%s'%pr_title)
+	# elif res=='PUSHED':
+	# 	return Response('[pushed]%s'%pr_title)
+	# else:
+	# 	raise HTTPException(500,{'res':res})
+	# 	# %s'%pr_title)
+
 
 def _shell(CMD,**kw):
 	return subprocess.check_output(' '.join(CMD),shell=True,executable='bash',**kw)
@@ -419,84 +454,5 @@ def df_compare(oldDf,newDf):
 			else:
 				assert 0,(SAMPLE_ID,count)
 	return labels
-
-# # @router.post("/auto_pr2")
-# def auto_pull_request2( dat:csvData):
-# 	import os
-# 	from pprint import pprint
-# 	from collections import OrderedDict
-# 	import requests,io
-
-
-# 	GH_TOKEN = os.environ.get('GH_TOKEN')
-# 	edit_csv = 'root.hand_patch.csv'
-# 	subprocess.check_output('git pull origin master',shell=True)
-# 	subprocess.check_output(f'git checkout -f {dat.github_sha}',shell=True)
-# 	# oldCsv = io.BytesIO(requests.get(f'https://raw.githubusercontent.com/shouldsee/metacsv-ath-rnaseq/{dat.github_sha}/current.csv').content)
-# 	oldCsv = 'current.csv'
-# 	oldDf = pd.read_csv( oldCsv,index_col=[0],header=0)
-# 	newDf = pd.DataFrame( dat.data, None, dat.columns).set_index('SAMPLE_ID')
-
-
-# 	oldDf = df_stand(oldDf.reset_index());
-# 	newDf = df_stand(newDf.reset_index());
-# 	labels = df_compare(oldDf,newDf)
-
-# 	# except:
-# 	# 	extype, value, tb = sys.exc_info()
-# 	# 	traceback.print_exc()
-# 	# 	pdb.post_mortem(tb)
-# 	newDf_indexed = newDf.set_index('SAMPLE_ID')
-# 	editDf = pd.read_csv( edit_csv, index_col=[0],header=0)
-# 	editDf = df_stand(editDf).set_index('SAMPLE_ID')
-# 	for SAMPLE_ID,label in labels.items():
-# 		if label   in ['edited','added']:
-# 			editDf.loc[SAMPLE_ID,:] = newDf_indexed.loc[SAMPLE_ID]
-# 		elif label == 'deleted':
-# 			_ = '''
-# 			Fragile. needs a pointer that delete a record using hand_patch
-# 			'''
-# 			if 'SAMPLE_ID' in editDf.index.values:
-# 				del editDf.loc[SAMPLE_ID]
-# 		else:
-# 			assert 0,(label,)	
-
-# 	if not len(labels):
-# 		print('[no_record_changed]')
-# 		##### No records changed. return respose 
-# 		return Response('[nothing_changed]')
-# 	else:
-# 		import sys
-# 		editDf.fillna("NA").to_csv(edit_csv, index=1)
-# 		subprocess.check_output(f'{sys.executable} main.py patch_by_hand 2>ERROR',shell=True)
-
-# 		isotime  = date_format_iso()
-# 		pr_title ='{dat.pr_tag}_{dat.email}_{isotime}'
-# 		pr_title = pr_title.format(**locals())
-# 		pr_msg_file = '_pr.message'
-# 		branch = re.sub('[^0-9a-zA-Z\-_]','-',pr_title)
-
-# 		meta = pd.DataFrame([],None,columns=['value'])
-# 		# .set_index()
-# 		with open(pr_msg_file,'w') as f:
-# 			f.write('%s\n\n'%pr_title)
-# 			f.write('### Changed Rows \n')
-# 			pd.Series(labels).to_frame('STATUS').to_html(f)
-# 			f.write('\n\n')
-# 			f.write('### Pull Request Meta \n')
-# 			# f.write('--------------------------\n')
-# 			meta.loc['isotime'] = isotime
-# 			meta.to_html(f)
-# 			f.write('\n\n')
-# 			f.write('### New rows details \n')
-# 			pd.Series(labels).to_frame('STATUS').merge(left_index=True,right_index=True,how='left',right=newDf.set_index('SAMPLE_ID')).to_html(f)
-# 			f.write('\n\n')
-
-
-# 	subprocess.check_output(' '.join(['HUB_VERBOSE=1','bash','autopr.sh',GH_TOKEN,
-# 		'--file',pr_msg_file,
-# 		'2>ERROR','1>STDOUT']),shell=True)
-# 	print('[auto_pr]Done')
-# 	return Response('[auto_pr]%s'%pr_title)
 
 app.include_router(router,prefix=PREFIX)

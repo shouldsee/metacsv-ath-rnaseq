@@ -7,6 +7,9 @@ import tempfile
 import requests
 from path import Path
 
+class UniqueGlobError(RuntimeError):
+	pass
+
 def dict_from_db_branch(user,repo,sha):
 	'''
 	download 
@@ -25,7 +28,11 @@ def dict_from_db_branch(user,repo,sha):
 #		subprocess.check_output('pigz -dc _TEMP.tar.gz | tar -xf - -C .', shell=True)
 		subprocess.check_output('cat _TEMP.tar.gz |tar -xzf - -C .', shell=True)
 #		subprocess.check_output('pigz -dc _TEMP.tar.gz | tar -xf - -C .', shell=True)
-		obj = dict_load_dir(tdir.glob('{user}-{repo}-*/DATABASE'.format(**locals()))[0])
+		fn = '{user}-{repo}-*/DATABASE'.format(**locals())
+		res = tdir.glob(fn)
+		if not len(res)==1:
+			raise UniqueGlobError({'sha':sha,'fn':fn})
+		obj = dict_load_dir(res[0])
 	tdir.rmtree()
 	print('[runtime]%.3fs'%(time.time()-t0))
 	return obj
