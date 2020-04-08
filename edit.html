@@ -1,9 +1,14 @@
 <!DOCTYPE html>
 <head>
-<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.css">
-<link rel="stylesheet" type="text/css" href="https://handsontable.com/static/css/main.css">
-<script src="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.js"></script>
+<link rel="stylesheet" type="text/css" href="/metacsv-ath-rnaseq/static/css/handsontable.full.min.css">
+<link rel="stylesheet" type="text/css" href="/metacsv-ath-rnaseq/static/css/handsontable-main.css">
+<link rel="stylesheet" href="/metacsv-ath-rnaseq/static/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+<script src="/metacsv-ath-rnaseq/static/js/handsontable.full.js"></script>
+
 <!--
+<link rel="stylesheet" href="https://getbootstrap.com/docs/3.4/dist/css/bootstrap.min.css" crossorigin="anonymous">
+
     <script type="text/javascript" src="https://raw.githubusercontent.com/nodeca/pako/master/dist/pako.js"></script>
 https://raw.githubusercontent.com/InvokIT/js-untar/master/build/dist/untar.js
 <script type="text/javascript" src="/static/js/pako.js"></script>
@@ -11,24 +16,58 @@ https://raw.githubusercontent.com/InvokIT/js-untar/master/build/dist/untar.js
 -->
 
 
+<script src="/metacsv-ath-rnaseq/static/js/jquery.slim.min.js" integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8=" crossorigin="anonymous"></script>
+<script src="/metacsv-ath-rnaseq/static/js/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="/metacsv-ath-rnaseq/static/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 
+<style type="text/css">body {  padding-top: 70px;}</style>
 
-<!-- <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<!-- 
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 -->
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+
 </head>
 
 
-<body>
+<div class="container">
+
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark" id="navbar">
+  <a class="navbar-brand" href="/metacsv-ath-rnaseq/docs/">metacsv-ath-rnaseq</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarCollapse">
+    <ul class="navbar-nav mr-auto">
+        <li>
+            <button type="button" class="btn btn-primary size-medium bg-green text-white shadow hover-moveup" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">Create Pull Request</button>
+                
+        </li>
+        <li>
+            <button id="export-csv" class="btn btn-primary" style="margin-left: 5px;">Download CSV</button>
+        </li>      
+        <li class="nav-item active">
+            <input id="github-branch-input" style="width: 300px; margin-left: 5px;"></input>
+            <button id="github-branch-button" class="btn btn-primary" style="margin-left: 5px;">Checkout Branch (Disabled)</button>
+        </li>
+        <!--
+      <li class="nav-item">
+        <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+      </li>
+        -->
+
+    </ul>
+    <form class="form-inline mt-2 mt-md-0">
+        <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Search (try "leaf"):</a>
+      <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search" id="search">
+<!--      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button> -->
+    </form>
+  </div>
+</nav>
+</div>
 
 
-<button type="button" class="btn btn-primary size-medium bg-green text-white shadow hover-moveup" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">Create Pull Request</button>
-<button id="export-csv" class="btn btn-primary" style="margin-left: 5px;">Download CSV</button>
-
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -41,11 +80,11 @@ https://raw.githubusercontent.com/InvokIT/js-untar/master/build/dist/untar.js
         <form id="form-elem">
           <div class="form-group">
             <label>Email</label>
-          	<input for="email" value="user@email.com"></input>
+            <input for="email" value="user@email.com"></input>
           </div>
           <div class="form-group">
             <label>PR Tag</label>
-          	<input for="pr_tag" value="pr-tag"></input>
+            <input for="pr_tag" value="pr-tag"></input>
           </div>
         </form>
       </div>
@@ -58,118 +97,101 @@ https://raw.githubusercontent.com/InvokIT/js-untar/master/build/dist/untar.js
 </div>
 
 
+<div class="container-fluid" id="main">
+    <div id="hot">Table loading, might take 20 seconds.... </div> 
+<!--    
+    <div id="hot">Table loading, might take 20 seconds.... </div> 
+-->
+</div>
 
-<div id="hot">Table loading, might take 20 seconds.... </div>
+</body>
 
 <script>
-function testttt(){
-    var test = { my: 'super', puper: [456, 567], awesome: 'pako' };
-    var binaryString = pako.deflate(JSON.stringify(test), { to: 'string' });
-    var restored = JSON.parse(pako.inflate(binaryString, { to: 'string' }));
+// function testttt(){
+//     var test = { my: 'super', puper: [456, 567], awesome: 'pako' };
+//     var binaryString = pako.deflate(JSON.stringify(test), { to: 'string' });
+//     var restored = JSON.parse(pako.inflate(binaryString, { to: 'string' }));
 
-};
+// };
 
 
-function load_tar_gz(url){
-    url = 'https://github.com/shouldsee/metacsv-ath-rnaseq/tarball/master';
+
+// function load_tar_gz(url){
+//     url = 'https://github.com/shouldsee/metacsv-ath-rnaseq/tarball/master';
+//     var xhr = new XMLHttpRequest();
+//     var req = xhr;
+//     xhr.open("GET",`https://cors-anywhere.herokuapp.com/${url}`,true);
+//     // https://codeload.github.com/mafintosh/tar-stream/legacy.tar.gz/master",true);
+//     xhr.responseType = "arraybuffer";
+//     function stringToArrayBuffer(str) {
+//         // workaround suggested by https://stackoverflow.com/a/27131778/8083313
+//         var buf = new ArrayBuffer(str.length);
+//         var bufView = new Uint8Array(buf);
+//         for (var i=0, strLen=str.length; i<strLen; i++) {
+//             bufView[i] = str.charCodeAt(i);
+//         }
+//         return buf;
+//     }
+//     function dirname(path) {
+//          return path.match(/.*\//)[0];
+//          // .toString();
+//     }    
+//     // xhr.onreadystatechange = function(){
+//     xhr.onload = function(){
+//         var curr;
+//         window.curr = curr = this.response;
+//         window.curr = curr = pako.ungzip( curr, 
+//             { to: 'string' }
+//             );
+//         var curr = stringToArrayBuffer(curr);
+//         untar( curr )
+//             .then(function(extractedFiles) {
+//                 console.log(extractedFiles[0].name);
+//                 console.log("extacting2");                
+//                 window.extractedFiles = extractedFiles;
+//                 extractedFiles.map(function(fn){
+//                     window.fn = fn;
+//                     dir = dirname(fn.name);
+//                     if (fn.name.startsWith("shouldsee-metacsv-ath-rnaseq-dc5c288/DATABASE"))
+//                     {
+//                         console.log(fn.name);
+
+//                     };
+//                     // if (dir==="shouldsee-metacsv-ath-rnaseq-dc5c288/DATABASE" & dir!=fn.name){
+//                     //     console.log(fn.name);
+//                     // };
+//                 })
+//             });
+
+//     }
+//     xhr.send();
+
+// }
+
+
+_stderr = function(str){
+    console.log(str);
+    document.getElementById('hot').insertAdjacentHTML( 'beforeend', "<br>"+str);
+}
+
+{
+    document.getElementById("github-branch-input").value ="shouldsee/metacsv-ath-rnaseq:data";
     var xhr = new XMLHttpRequest();
-    var req = xhr;
-    xhr.open("GET",`https://cors-anywhere.herokuapp.com/${url}`,true);
-    // https://codeload.github.com/mafintosh/tar-stream/legacy.tar.gz/master",true);
-    xhr.responseType = "arraybuffer";
-    function stringToArrayBuffer(str) {
-        // workaround suggested by https://stackoverflow.com/a/27131778/8083313
-        var buf = new ArrayBuffer(str.length);
-        var bufView = new Uint8Array(buf);
-        for (var i=0, strLen=str.length; i<strLen; i++) {
-            bufView[i] = str.charCodeAt(i);
-        }
-        return buf;
-    }
-    function dirname(path) {
-         return path.match(/.*\//)[0];
-         // .toString();
-    }    
-    // xhr.onreadystatechange = function(){
+    var branch = "data";
+    var url = `https://api.github.com/repos/shouldsee/metacsv-ath-rnaseq/git/refs/heads/${branch}`;
+    xhr.open("GET", url, false);
     xhr.onload = function(){
-        var curr;
-        window.curr = curr = this.response;
-        window.curr = curr = pako.ungzip( curr, 
-            { to: 'string' }
-            );
-        var curr = stringToArrayBuffer(curr);
-        untar( curr )
-            .then(function(extractedFiles) {
-                console.log(extractedFiles[0].name);
-                console.log("extacting2");                
-                window.extractedFiles = extractedFiles;
-                extractedFiles.map(function(fn){
-                    window.fn = fn;
-                    dir = dirname(fn.name);
-                    if (fn.name.startsWith("shouldsee-metacsv-ath-rnaseq-dc5c288/DATABASE"))
-                    {
-                        console.log(fn.name);
-
-                    };
-                    // if (dir==="shouldsee-metacsv-ath-rnaseq-dc5c288/DATABASE" & dir!=fn.name){
-                    //     console.log(fn.name);
-                    // };
-                })
-            });
-
+        document.github_sha = JSON.parse( this.responseText).object.sha;
+    }
+    xhr.onerror = function(){
+        _stderr("Unable to fetch github_sha for branch:"+branch);
+        _stderr("[exited]");
     }
     xhr.send();
-
 }
 
 
-var xhr = new XMLHttpRequest();
-xhr.open("GET","https://api.github.com/repos/shouldsee/metacsv-ath-rnaseq/git/refs",false);
-xhr.onreadystatechange = function(){
-	document.github_refs = JSON.parse( this.responseText);
-	document.github_sha = document.github_refs.find(ele => ele.ref === "refs/heads/data").object.sha
-    // document.github_sha = "362b3269498253d7f64ec04b96ce37cbeba410d5"
-}
-xhr.send();
 
-document.getElementById("export-csv").addEventListener("click", function(event) { document.hot.getPlugin("exportFile").downloadFile("csv", {filename: "Handsontable CSV Export example"});})
-document.getElementById("export-string-modal").addEventListener("click", function(event) {
-	// console.log("hi");
-	var dat = document.getElementById('form-elem');
-	var dict = {};
-	for(i=0;i<dat.elements.length;i++){
-		dict[dat.elements[i].attributes.for.value] = dat.elements[i].value;
-
-	};
-	var meta = dict;
-	window.dict = dict;
-	console.log(dict);
-
-	var xhr = new XMLHttpRequest();
-	xhr.open("POST", "/auto_pr/", true);
-	xhr.setRequestHeader("Content-Type", "application/json")
-	xhr.onreadystatechange = function() { 
-	// Call a function when the state changes.
-	    if (this.readyState === XMLHttpRequest.DONE){
-	    	if (this.status===200){
-		    	window.alert('Update successful!\nResponseText:'+this.responseText)
-	    	}else{
-		    	window.alert('Update failed!'+this)    		
-	    	}
-	    }
-	}
-	var data=document.hot.getData();
-	xhr.send(JSON.stringify({
-		"type":"csvBuffer",
-		"data":data,
-		"columns":document.hot.getColHeader(),
-		"email":meta.email,
-		"pr_tag":meta.pr_tag,
-		"github_sha":document.github_sha
-	}));
-
-	// xhr.send(JSON.stringify(document.hot.getData()));
-})
 
 
 // var hotElement = document.querySelector('#hot');
@@ -190,7 +212,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	  if (this.readyState == 4 && this.status == 200) {
 
         console.log("...loading csv");
-        console.log(this.responseText.slice(100));
+        console.log(this.responseText.slice(0,100));
 		// var dataBuffer = CSVToArray(this.responseText).slice(1);
         // var columns = dataBuffer[0];
         var dataBuffer = JSON.parse(this.responseText);
@@ -199,6 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		window.columns = columns;
         document.dataBuffer = dataBuffer;
 		var hotSettings = {
+          // fixedRowsTop: 1,
           data:dataBuffer,
 		  // data: dataBuffer.slice(1),
 		  // dataObject,
@@ -207,14 +230,24 @@ document.addEventListener('DOMContentLoaded', function() {
           columns: columns.map(function(v){
             return (    {
             "data":v,
+            // "width":(document.getElementById("main").innerWidth-100)/columns.length
+            // "width":150,
+            // (window.innerWidth-750)/columns.length
+            // "width":1000,
+            // (window.innerWidth-100)/columns.length
             "width":(window.innerWidth-100)/columns.length
             })  ;}),
 
 
-		  stretchH: 'all',
-		  width: 805,
+		  // stretchH: 'all',
+		  // width: 805,
 		  autoWrapRow: true,
-		  // height: "100%",
+          // height: "100%",
+          height:window.innerHeight -50 - document.getElementById("navbar").offsetHeight,
+
+		  // height: document.getElementById("main").innerHeight,
+
+          // "100%",
 		  // maxRows: 22,
 		  manualRowResize: true,
 		  manualColumnResize: true,
@@ -233,11 +266,93 @@ document.addEventListener('DOMContentLoaded', function() {
 			hotSettings);
 	  	// console.log(this.responseText)
 	    // document.getElementById("demo").innerHTML = this.responseText;
+        document.csvDataBuffer = document.hot.getData();
 	  }else{
-	  	console.log(this);
+        _stderr( this );
 	  }
 	};
 	xhttp.send();
+
+
+function zip(arrays) {
+    return arrays[0].map(function(_,i){
+        return arrays.map(function(array){return array[i]})
+    });
+}
+
+
+// function fromEntries(){
+//     out = {};
+//     for i in 
+
+// }
+
+window.zip=zip;
+
+ function filter(search) {
+    var row, r_len;
+        var data = document.csvDataBuffer;
+        var array = [];
+    for (row = 0, r_len = data.length; row < r_len; row++) {
+            for(col = 0, c_len = data[row].length; col < c_len; col++) {
+      // console.log(data[row][col] + " " + search);
+                if(('' + data[row][col]).toLowerCase().indexOf(search) > -1) {
+            array.push(data[row]);
+          break;
+        }
+            }
+        }
+        array = array.map(function(rowData){
+            out = {};
+            for (i=0; i<=columns.length; i++){
+                out[columns[i]] = rowData[i];
+            }
+            return(out);
+        });
+        // document
+        document.hot.loadData(array);
+        // document.hot.loadData();
+  }
+  
+  Handsontable.dom.addEvent(document.getElementById('search'), 'keyup', function() {
+    filter(('' + this.value).toLowerCase());
+  });
+
+document.getElementById("export-csv").addEventListener("click", function(event) { document.hot.getPlugin("exportFile").downloadFile("csv", {filename: "metacsv-ath-rnaseq.edit.csv"});})
+document.getElementById("export-string-modal").addEventListener("click", function(event) {
+    // console.log("hi");
+    var dat = document.getElementById('form-elem');
+    var dict = {};
+    for(i=0;i<dat.elements.length;i++){
+        dict[dat.elements[i].attributes.for.value] = dat.elements[i].value;
+
+    };
+    var meta = dict;
+    window.dict = dict;
+    console.log(dict);
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/metacsv-ath-rnaseq/auto_pr/", true);
+    xhr.setRequestHeader("Content-Type", "application/json")
+    xhr.onload = function() {
+        window.alert('Update successful!\nResponseText:'+this.responseText);
+    }
+    xhr.onerror = function(){
+        window.alert("Update failed!");        
+    }
+    var data=document.hot.getData();
+    xhr.send(JSON.stringify({
+        "type":"csvBuffer",
+        "data":data,
+        "columns":document.hot.getColHeader(),
+        "email":meta.email,
+        "pr_tag":meta.pr_tag,
+        "github_sha":document.github_sha
+    }));
+
+    // xhr.send(JSON.stringify(document.hot.getData()));
+});
+
 
 });
 
@@ -415,5 +530,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 </script>
 
-</body>
 </html>

@@ -14,14 +14,15 @@ def test_main():
 	d_load = dict_load_dir(fn)
 	assert d == d_load, pprint((d,d_load))
 
-def test_tar():
-	import tarfile
-	# subprocess.check_output('tar -cvzf {fn}.tgz {fn}/*'.format(**locals()), shell=True)	
-	with Path(fn) as _:
-		subprocess.check_output('tar -cvzf ../{fn}.tgz *'.format(**locals()), shell=True)	
 
-	d_load = dict_load_dir(tarfile.open(fn+'.tgz','r'))
-	assert d == d_load, pprint((d,d_load))
+# def test_tar():
+# 	import tarfile
+# 	# subprocess.check_output('tar -cvzf {fn}.tgz {fn}/*'.format(**locals()), shell=True)	
+# 	with Path(fn) as _:
+# 		subprocess.check_output('tar -cvzf ../{fn}.tgz *'.format(**locals()), shell=True)	
+
+# 	d_load = dict_load_dir(tarfile.open(fn+'.tgz','r'))
+# 	assert d == d_load, pprint((d,d_load))
 
 if __name__ == '__main__':
 	test_main()

@@ -1,32 +1,30 @@
 from fastapi import FastAPI, HTTPException, APIRouter
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse, Response, JSONResponse, StreamingResponse
+from fastapi.responses import HTMLResponse, Response, JSONResponse, StreamingResponse, RedirectResponse
 from pydantic import BaseModel
 import pandas as pd
 from path import Path
-DIR = Path('.').realpath()
 from collections import OrderedDict
 import subprocess
-
-
 from metacsv_ath_rnaseq.models import LocalSample
-# class LocalSample(LocalSample):
-# 	pass
 
+def read_close(fn,encoding=None):
+	with open(fn,"rb") as f:
+		return f.read().decode(encoding) if encoding else f.read().decode()
+
+DIR = Path('.').realpath()
 DEFAULT_BRANCH="data"
 
 PREFIX = "/metacsv-ath-rnaseq"
 app = FastAPI(
-	# openapi_url="/api/v1/movies/openapi.json", 
 	openapi_url=PREFIX+"/openapi.json",
-	# /docs",
 	docs_url=PREFIX+"/docs",
 	)
+@app.get(PREFIX) 
+def homepage(): return RedirectResponse(PREFIX+'/docs')	
 
 router = APIRouter(
 	)
-
-
 app.mount(PREFIX+"/static", StaticFiles(directory="."), name="static");
 from fastapi.openapi.utils import get_openapi
 def custom_openapi():
@@ -35,20 +33,39 @@ def custom_openapi():
     openapi_schema = get_openapi(
     	title = "metacsv-ath-rnaseq",
         # title="Custom title",
-        version="0.0.3",
+        version=read_close("VERSION").strip(),
         description='''
 
-[Github](https://github.com/shouldsee/metacsv-ath-rnaseq)
+<img width="16" height="16" src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"></img>[Github](https://github.com/shouldsee/metacsv-ath-rnaseq)
 
-This project aims to provide a better API for retriving meta-data for public Ath-RNASEQ datasets. 
-This API can be improved by creating Github PR.
+This project aims to provide a better API for retriving meta-data for public Ath-RNASEQ datasets, thus enabling better 
+understanding of the plant transcriptome.
+
+## Download Data
+
+Choose one of:
+
+1. Using hosted api endpoint at `/csv/`,`/simple_json/`,`/db_json/`
+1. Use `metacsv_ath_rnaseq.utils.dict_from_db_branch(user, repo, sha)`
+1. Or clone the github branch `shouldsee/metacsv-ath-rnaseq:data` and 
+load using `metacsv_ath_rnaseq.header.dict_from_dir("./DATABASE")`
+
+## Edit Data
 
 The github branch `shouldsee/metacsv-ath-rnaseq/data` is the current merging head getting updated. 
-It has a directory "/DATABASE/" which is a file-based database that may be updated through:
-  1. the `/edit/` interface
-  1. making a custom PR  
+It has a directory "/DATABASE/" which is a file-based database that may be updated through one of:
 
-        ''',
+1. Manually edit using the `/edit` endpoint
+1. POST request the `/auto_pr` endpoint (not documented)
+1. Manually create a PR to "shouldsee/metacsv-ath-rnaseq:data" after editing the "./DATABASE" directory in your branch.
+
+
+## Install python package:
+
+- Require Python >= 3.6 (check `pip -V` )
+- `pip install metacsv-ath-rnaseq@https://github.com/shouldsee/metacsv-ath-rnaseq/tarball/master`
+
+ ''',
         routes=app.routes,
     )
     openapi_schema["info"]["x-logo"] = {
@@ -58,9 +75,15 @@ It has a directory "/DATABASE/" which is a file-based database that may be updat
     return app.openapi_schema
 app.openapi = custom_openapi
 
-
-app.openapi = custom_openapi
-
+# @app.get(PREFIX)
+# def _():
+# 	return RedirectResponse(PREFIX+'/docs')
+	# return RedirectResponse(app.url_path_for(PREFIX+'/docs'))
+	# from pprint import pprint
+	# pprint(router.routes)
+	# import pdb; pdb.set_trace()
+	# return RedirectResponse()
+	# return RedirectResponse(app.url_path_for("/docs"))
 @router.get("/edit",
 	# summary=
 # response_model = HTMLResponse,
@@ -100,54 +123,18 @@ def jinja2_format(s,**context):
 	# .update(__builtins__)
 	return Template(s,undefined=StrictUndefined).render(**d)
 
-import requests
-import re,json
+
+from metacsv_ath_rnaseq.utils import resolve_repo_sha
 def resolve_sha(sha):
-	if re.match('[0-9a-fA-F]{30}',sha) is not None:
-		return sha
-	else:
-		# url="https://api.github.com/repos/shouldsee/metacsv-ath-rnaseq/git/refs"
-		# x = json.loads(requests.get(url).text)
-		# x = [y["object"]["sha"] for y in x if y["ref"]=="refs/heads/{sha}".format(sha=sha)][0]
+	return resolve_repo_sha('shouldsee', 'metacsv-ath-rnaseq', sha)
 
-		url="https://api.github.com/repos/shouldsee/metacsv-ath-rnaseq/git/refs/heads/{sha}".format(sha=sha)
-		x = json.loads(requests.get(url).text)
-		x = x["object"]["sha"]
-		return x
-
+from metacsv_ath_rnaseq.utils import dict_from_db_branch
 @memory.cache
 def _get_json(sha):
-	import time
-	t0 = time.time()
-	
-	from metacsv_ath_rnaseq.header import dict_load_dir
-	import subprocess
-	import requests
-	import tempfile
-	import urllib.request
-	from path import Path
-	with Path(tempfile.mkdtemp(sha)).realpath() as tdir:
-		debug = 0
-		if debug:
-			obj = dict_load_dir('/tmp/shouldsee-metacsv-ath-rnaseq-c7d8315/DATABASE')
-			return obj
-
-		url = 'http://github.com/shouldsee/metacsv-ath-rnaseq/tarball/{sha}'.format(**locals())
-		# _shell([f'curl -sL {url} | tar -xzf - -C $PWD'])
+	return dict_from_db_branch("shouldsee","metacsv-ath-rnaseq",sha, )
 
 
-		urllib.request.urlretrieve(url,'_TEMP.tar.gz')
-#		subprocess.check_output('pigz -dc _TEMP.tar.gz | tar -xf - -C .', shell=True)
-		subprocess.check_output('cat _TEMP.tar.gz |tar -xzf - -C .', shell=True)
-#		subprocess.check_output('pigz -dc _TEMP.tar.gz | tar -xf - -C .', shell=True)
-
-		obj = dict_load_dir(tdir.glob('shouldsee-metacsv-*/DATABASE')[0])
-	tdir.rmtree()
-	print('[runtime]%.3fs'%(time.time()-t0))
-	return obj
-
-
-@router.get("/db_json/{sha}",
+@router.get("/db_json/{commit_sha_or_branch}",
     summary="Return a db-json-formatted database for github commit-sha1/branch-name {sha}",
     description='''
 ## Return a json-formatted database for a commit-sha1/branch-name
@@ -157,14 +144,15 @@ def _get_json(sha):
   - example: "branch"
     ''',
 	)
-def get_db_json(sha):
-	sha = resolve_sha(sha)
+def get_db_json(commit_sha_or_branch):
+	sha = resolve_sha(commit_sha_or_branch)
 	import tempfile
 	from path import Path
-	obj = _get_json(sha, )
+	obj = _get_json(sha,)
+	# 'shouldsee', 'metacsv_ath_rnaseq')
 	return obj
 
-@router.get("/db_json/{sha}/{SAMPLE_ID}",
+@router.get("/db_json/{commit_sha_or_branch}/{SAMPLE_ID}",
     summary="Return a db-json-formatted record {sha}",
     description='''
 ## Return a db-json-formatted database for a commit-sha1/branch-name
@@ -175,8 +163,8 @@ def get_db_json(sha):
     ''',
     response_model = LocalSample,
 	)
-def get_db_json_record(sha,SAMPLE_ID):
-	sha = resolve_sha(sha)
+def get_db_json_record(commit_sha_or_branch,SAMPLE_ID):
+	sha = resolve_sha(commit_sha_or_branch)
 	import tempfile
 	from path import Path
 	obj = _get_json(sha, )[SAMPLE_ID]
@@ -185,9 +173,9 @@ def get_db_json_record(sha,SAMPLE_ID):
 
 
 
-@router.get("/simple_json/{sha}",
+@router.get("/simple_json/{commit_sha_or_branch}",
     # response_model=Item,
-    summary="Return a simple_json-formatted database for github commit-sha1/branch-name {sha}",
+    summary="Return a simple_json-formatted database for github commit-sha1/branch-name",
     description='''
 ## Return a simple_json-formatted database for a commit-sha1/branch-name
 
@@ -199,20 +187,21 @@ def get_db_json_record(sha,SAMPLE_ID):
     # description="Create an item with all the information, name, description, price, tax and a set of unique tags",
 
 	)
-def get_simple_json(sha):
-	sha = resolve_sha(sha)
+def get_simple_json(commit_sha_or_branch):
+	sha = resolve_sha(commit_sha_or_branch)
 
 	import tempfile
 	from path import Path
 	from metacsv_ath_rnaseq.models import LocalSample
 	from collections import OrderedDict
-	obj = _get_json(sha)
+	obj = _get_json(sha,)
+	 # 'shouldsee','metacsv-ath-rnaseq')
 	obj = OrderedDict([(k, LocalSample.parse_obj(x).to_simple_dict()) for k,x in obj.items()])
 	return obj
 
 
 
-@router.get("/simple_json/{sha}/{SAMPLE_ID}",
+@router.get("/simple_json/{commit_sha_or_branch}/{SAMPLE_ID}",
     # response_model=Item,
     summary="Return a simple_json-formatted database for github commit-sha1/branch-name {sha}",
     description='''
@@ -226,8 +215,8 @@ def get_simple_json(sha):
     # description="Create an item with all the information, name, description, price, tax and a set of unique tags",
 
 	)
-def get_simple_json_record(sha,SAMPLE_ID):
-	sha = resolve_sha(sha)
+def get_simple_json_record(commit_sha_or_branch,SAMPLE_ID):
+	sha = resolve_sha(commit_sha_or_branch)
 
 	import tempfile
 	from path import Path
@@ -258,7 +247,8 @@ def get_csv(sha):
 	from path import Path
 	from metacsv_ath_rnaseq.models import LocalSample
 	import pandas as pd
-	obj = _get_json(sha)
+	obj = _get_json(sha,)
+	 # USER, REPO)
 
 	csvBuffer = io.StringIO()
 	df = rec_to_df(obj)
@@ -430,83 +420,83 @@ def df_compare(oldDf,newDf):
 				assert 0,(SAMPLE_ID,count)
 	return labels
 
-# @router.post("/auto_pr2")
-def auto_pull_request2( dat:csvData):
-	import os
-	from pprint import pprint
-	from collections import OrderedDict
-	import requests,io
+# # @router.post("/auto_pr2")
+# def auto_pull_request2( dat:csvData):
+# 	import os
+# 	from pprint import pprint
+# 	from collections import OrderedDict
+# 	import requests,io
 
 
-	GH_TOKEN = os.environ.get('GH_TOKEN')
-	edit_csv = 'root.hand_patch.csv'
-	subprocess.check_output('git pull origin master',shell=True)
-	subprocess.check_output(f'git checkout -f {dat.github_sha}',shell=True)
-	# oldCsv = io.BytesIO(requests.get(f'https://raw.githubusercontent.com/shouldsee/metacsv-ath-rnaseq/{dat.github_sha}/current.csv').content)
-	oldCsv = 'current.csv'
-	oldDf = pd.read_csv( oldCsv,index_col=[0],header=0)
-	newDf = pd.DataFrame( dat.data, None, dat.columns).set_index('SAMPLE_ID')
+# 	GH_TOKEN = os.environ.get('GH_TOKEN')
+# 	edit_csv = 'root.hand_patch.csv'
+# 	subprocess.check_output('git pull origin master',shell=True)
+# 	subprocess.check_output(f'git checkout -f {dat.github_sha}',shell=True)
+# 	# oldCsv = io.BytesIO(requests.get(f'https://raw.githubusercontent.com/shouldsee/metacsv-ath-rnaseq/{dat.github_sha}/current.csv').content)
+# 	oldCsv = 'current.csv'
+# 	oldDf = pd.read_csv( oldCsv,index_col=[0],header=0)
+# 	newDf = pd.DataFrame( dat.data, None, dat.columns).set_index('SAMPLE_ID')
 
 
-	oldDf = df_stand(oldDf.reset_index());
-	newDf = df_stand(newDf.reset_index());
-	labels = df_compare(oldDf,newDf)
+# 	oldDf = df_stand(oldDf.reset_index());
+# 	newDf = df_stand(newDf.reset_index());
+# 	labels = df_compare(oldDf,newDf)
 
-	# except:
-	# 	extype, value, tb = sys.exc_info()
-	# 	traceback.print_exc()
-	# 	pdb.post_mortem(tb)
-	newDf_indexed = newDf.set_index('SAMPLE_ID')
-	editDf = pd.read_csv( edit_csv, index_col=[0],header=0)
-	editDf = df_stand(editDf).set_index('SAMPLE_ID')
-	for SAMPLE_ID,label in labels.items():
-		if label   in ['edited','added']:
-			editDf.loc[SAMPLE_ID,:] = newDf_indexed.loc[SAMPLE_ID]
-		elif label == 'deleted':
-			_ = '''
-			Fragile. needs a pointer that delete a record using hand_patch
-			'''
-			if 'SAMPLE_ID' in editDf.index.values:
-				del editDf.loc[SAMPLE_ID]
-		else:
-			assert 0,(label,)	
+# 	# except:
+# 	# 	extype, value, tb = sys.exc_info()
+# 	# 	traceback.print_exc()
+# 	# 	pdb.post_mortem(tb)
+# 	newDf_indexed = newDf.set_index('SAMPLE_ID')
+# 	editDf = pd.read_csv( edit_csv, index_col=[0],header=0)
+# 	editDf = df_stand(editDf).set_index('SAMPLE_ID')
+# 	for SAMPLE_ID,label in labels.items():
+# 		if label   in ['edited','added']:
+# 			editDf.loc[SAMPLE_ID,:] = newDf_indexed.loc[SAMPLE_ID]
+# 		elif label == 'deleted':
+# 			_ = '''
+# 			Fragile. needs a pointer that delete a record using hand_patch
+# 			'''
+# 			if 'SAMPLE_ID' in editDf.index.values:
+# 				del editDf.loc[SAMPLE_ID]
+# 		else:
+# 			assert 0,(label,)	
 
-	if not len(labels):
-		print('[no_record_changed]')
-		##### No records changed. return respose 
-		return Response('[nothing_changed]')
-	else:
-		import sys
-		editDf.fillna("NA").to_csv(edit_csv, index=1)
-		subprocess.check_output(f'{sys.executable} main.py patch_by_hand 2>ERROR',shell=True)
+# 	if not len(labels):
+# 		print('[no_record_changed]')
+# 		##### No records changed. return respose 
+# 		return Response('[nothing_changed]')
+# 	else:
+# 		import sys
+# 		editDf.fillna("NA").to_csv(edit_csv, index=1)
+# 		subprocess.check_output(f'{sys.executable} main.py patch_by_hand 2>ERROR',shell=True)
 
-		isotime  = date_format_iso()
-		pr_title ='{dat.pr_tag}_{dat.email}_{isotime}'
-		pr_title = pr_title.format(**locals())
-		pr_msg_file = '_pr.message'
-		branch = re.sub('[^0-9a-zA-Z\-_]','-',pr_title)
+# 		isotime  = date_format_iso()
+# 		pr_title ='{dat.pr_tag}_{dat.email}_{isotime}'
+# 		pr_title = pr_title.format(**locals())
+# 		pr_msg_file = '_pr.message'
+# 		branch = re.sub('[^0-9a-zA-Z\-_]','-',pr_title)
 
-		meta = pd.DataFrame([],None,columns=['value'])
-		# .set_index()
-		with open(pr_msg_file,'w') as f:
-			f.write('%s\n\n'%pr_title)
-			f.write('### Changed Rows \n')
-			pd.Series(labels).to_frame('STATUS').to_html(f)
-			f.write('\n\n')
-			f.write('### Pull Request Meta \n')
-			# f.write('--------------------------\n')
-			meta.loc['isotime'] = isotime
-			meta.to_html(f)
-			f.write('\n\n')
-			f.write('### New rows details \n')
-			pd.Series(labels).to_frame('STATUS').merge(left_index=True,right_index=True,how='left',right=newDf.set_index('SAMPLE_ID')).to_html(f)
-			f.write('\n\n')
+# 		meta = pd.DataFrame([],None,columns=['value'])
+# 		# .set_index()
+# 		with open(pr_msg_file,'w') as f:
+# 			f.write('%s\n\n'%pr_title)
+# 			f.write('### Changed Rows \n')
+# 			pd.Series(labels).to_frame('STATUS').to_html(f)
+# 			f.write('\n\n')
+# 			f.write('### Pull Request Meta \n')
+# 			# f.write('--------------------------\n')
+# 			meta.loc['isotime'] = isotime
+# 			meta.to_html(f)
+# 			f.write('\n\n')
+# 			f.write('### New rows details \n')
+# 			pd.Series(labels).to_frame('STATUS').merge(left_index=True,right_index=True,how='left',right=newDf.set_index('SAMPLE_ID')).to_html(f)
+# 			f.write('\n\n')
 
 
-	subprocess.check_output(' '.join(['HUB_VERBOSE=1','bash','autopr.sh',GH_TOKEN,
-		'--file',pr_msg_file,
-		'2>ERROR','1>STDOUT']),shell=True)
-	print('[auto_pr]Done')
-	return Response('[auto_pr]%s'%pr_title)
+# 	subprocess.check_output(' '.join(['HUB_VERBOSE=1','bash','autopr.sh',GH_TOKEN,
+# 		'--file',pr_msg_file,
+# 		'2>ERROR','1>STDOUT']),shell=True)
+# 	print('[auto_pr]Done')
+# 	return Response('[auto_pr]%s'%pr_title)
 
 app.include_router(router,prefix=PREFIX)
