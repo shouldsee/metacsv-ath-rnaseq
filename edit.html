@@ -57,6 +57,9 @@ body {  padding-top: 80px;}
         <li>
             <button id="github-branch-button" class="btn btn-primary" style="margin-left: 5px;">Checkout Branch(dev)</button>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" id="row-count" tabindex="-1" aria-disabled="true">RowCount:-1</a>
+        </li>
         <li>
           <input class="mr-sm-2" type="text" placeholder="try 'leaf'" aria-label="Search" id="search">
             
@@ -212,7 +215,15 @@ function db_to_csv(array,columns){
 }
 window.db_to_csv=db_to_csv;
 
+
+function _hot_loadData(hot,array){
+  hot.loadData(array);
+  document.getElementById("row-count").innerText=`RowCount:${array.length}`;
+
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+
 
 	var xhttp = new XMLHttpRequest();
     // var url = `/csv/${document.github_sha}`;
@@ -289,6 +300,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		document.hot = new Handsontable(
 			document.getElementById('hot'),
 			hotSettings);
+    _hot_loadData(document.hot,Object.values(hashDataBuffer));
 	  	// console.log(this.responseText)
 	    // document.getElementById("demo").innerHTML = this.responseText;
         document.csvDataBuffer = document.hot.getData();
@@ -347,7 +359,9 @@ Handsontable.dom.addEvent(document.getElementById('search'), 'keyup', function(e
             return(out);
         });
         // document
-  hot.loadData(array);
+
+  _hot_loadData(hot,array);
+
   // hot.showRows(index);
   var search = hot.getPlugin('search');
   var queryResult = search.query(search_str);

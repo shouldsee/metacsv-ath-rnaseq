@@ -39,7 +39,8 @@ def _read_pandas(input_pk,**kw):
 	elif input_pk.endswith('tsv'):
 		df = pd.read_csv(input_pk,index_col=[0],sep='\t',**kw)
 	elif input_pk.endswith('list'):
-		df = pd.read_csv(input_pk,index_col=[0],header=None).index
+		df = pd.read_csv(input_pk,index_col=[0],header=None)
+		# .index
 	else:
 		assert 0, (input_pk,)
 	return df

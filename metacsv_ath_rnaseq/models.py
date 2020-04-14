@@ -1,10 +1,11 @@
 
 import warnings
-from typing import List,Dict
+from typing import List,Dict,Any
 from collections import OrderedDict
 from pydantic import BaseModel
 from collections import defaultdict
 from metacsv_ath_rnaseq.header import dict_dump_dir, dict_load_dir
+import json
 
 def tree(): return defaultdict(tree)
 def tree_from_dict(data):
@@ -38,6 +39,8 @@ class LocalSample(BaseModel):
 	SAMPLE_ID:                str	
 	RUN_ID_LIST: List[str] = None
 	SAMPLE_ATTRIBUTES: Dict[str,str] =None
+	STUDY: Dict[str,Any] = {}
+	STUDY_ID: str = ''
 
 	@property
 	def WORDS(self) -> str:
@@ -107,6 +110,8 @@ class LocalSample(BaseModel):
 			('tag_source_name',     self.tag_source_name),
 			('tag_age',             self.tag_age),
 			('tags',                self.tags),
+			('STUDY_JSON',          json.dumps(self.STUDY)),
+			('STUDY_ID',            self.STUDY_ID),
 		])
 
 	@classmethod
@@ -120,6 +125,7 @@ class LocalSample(BaseModel):
 			out_data['SAMPLE_ATTRIBUTES']['source_name'] = data['tag_source_name']
 		if data.get('tag_age','NA') not in ['NA','']:
 			out_data['SAMPLE_ATTRIBUTES']['age'] = data['tag_age']
+		out_data["STUDY"] = json.parse(out_data["STUDY_JSON"])
 		return cls.parse_obj(out_data)
 
 	@classmethod
@@ -157,6 +163,8 @@ class LocalSample(BaseModel):
 			cls.normalise_word(x['TAG'][0]): cls.normalise_word(x['VALUE'][0])
 			for x in data['SAMPLE'][0]['SAMPLE_ATTRIBUTES'][0]['SAMPLE_ATTRIBUTE']
 			}
+		out_data["STUDY"] = data['STUDY'][0]
+		out_data["STUDY_ID"] = data["STUDY"][0]["IDENTIFIERS"][0]["PRIMARY_ID"][0]
 		return cls.parse_obj(out_data)
 
 	def dump_dir(self, fn):
