@@ -33,7 +33,7 @@ app = FastAPI(
 	docs_url=PREFIX+"/docs",
 	)
 @app.get(PREFIX) 
-def homepage(): return RedirectResponse(PREFIX+'/docs')	
+def homepage(): return RedirectResponse(PREFIX+'/edit')	
 
 router = APIRouter(
 	)
