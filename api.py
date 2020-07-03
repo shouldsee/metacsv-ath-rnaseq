@@ -48,7 +48,8 @@ def custom_openapi(PREFIX=PREFIX):
         version=read_close("VERSION").strip(),
         description=jinja2_format('''
 
-<img width="16" height="16" src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"></img>[Github](https://github.com/shouldsee/metacsv-ath-rnaseq)
+<img width="16" height="16" src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"></img>[Github](https://github.com/shouldsee/metacsv-ath-rnaseq) 
+&nbsp;&nbsp;<a href="{{PREFIX}}">{{PREFIX}}</a>
 
 This project aims to provide a better API for retriving meta-data for public Ath-RNASEQ datasets, thus enabling better 
 understanding of the plant transcriptome.
